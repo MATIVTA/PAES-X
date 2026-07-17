@@ -47,6 +47,13 @@ DEFAULTS_POR_TIPO = {
     "generico": [7, 1, 0],
 }
 
+# El anuncio inmediato de "evento nuevo" solo se publica si al evento le
+# quedan como máximo estos días. Si agregas un evento con más anticipación
+# que esto (ej. algo a 5 meses), el bot NO lo anuncia todavía: espera y lo
+# publicará automáticamente el día en que el evento entre en esta ventana,
+# sin que tengas que hacer nada. Ajusta este número si quieres otra ventana.
+UMBRAL_ANUNCIO_INMEDIATO_DIAS = 60
+
 EMOJI_TIPO = {
     "ensayo": "📝",
     "inscripcion": "📋",
@@ -284,12 +291,24 @@ def main():
             continue
 
         tipo = evento.get("tipo", "generico")
+        dias_restantes = (fecha_evento - hoy_fecha).days
 
-        # --- Anuncio inmediato: si este evento nunca se ha anunciado,
-        # se publica HOY sin importar cuántos días falten (útil cuando
-        # un evento se anuncia con poca anticipación y hay cupos limitados). ---
+        # --- Anuncio inmediato: si este evento nunca se ha anunciado Y está
+        # dentro de la ventana razonable (o se fuerza con "anuncio_inmediato"),
+        # se publica HOY sin importar los avisos_dias (útil cuando un evento
+        # se anuncia con poca anticipación y hay cupos limitados). Si el
+        # evento está muy lejos todavía, se espera y se revisa de nuevo cada
+        # día hasta que entre en la ventana. ---
+        forzar = evento.get("anuncio_inmediato")  # true/false explícito, o None = automático
+        if forzar is True:
+            debe_anunciar_ahora = True
+        elif forzar is False:
+            debe_anunciar_ahora = False
+        else:
+            debe_anunciar_ahora = dias_restantes <= UMBRAL_ANUNCIO_INMEDIATO_DIAS
+
         key_nuevo = f"{evento.get('id', evento['titulo'])}_nuevo"
-        if not log.get(key_nuevo):
+        if debe_anunciar_ahora and not log.get(key_nuevo):
             print(f"Enviando anuncio de evento nuevo: {key_nuevo}")
             enviar_webhook(msg_nuevo(evento))
             log[key_nuevo] = True
