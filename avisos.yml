@@ -1,0 +1,31 @@
+name: Avisos PAES X
+
+on:
+  schedule:
+    # 12:00 UTC = 08:00 en Chile (horario de invierno, UTC-4) / 09:00 en horario de verano (UTC-3)
+    # Ajusta la hora si quieres que se publique más tarde o más temprano.
+    - cron: "0 12 * * *"
+  workflow_dispatch: {}  # permite ejecutarlo manualmente desde la pestaña Actions para probar
+
+permissions:
+  contents: write
+
+jobs:
+  avisos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Ejecutar bot
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python3 bot.py
+
+      - name: Guardar registro de avisos enviados
+        run: |
+          git config user.name "paes-x-bot"
+          git config user.email "actions@github.com"
+          git add sent_log.json
+          git diff --cached --quiet || git commit -m "Actualiza registro de avisos enviados"
+          git push

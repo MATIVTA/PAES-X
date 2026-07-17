@@ -1,0 +1,46 @@
+{
+  "_instrucciones": "Edita este archivo para agregar/quitar eventos. No borres el campo _instrucciones si no quieres, es solo un comentario y el bot lo ignora. tipo debe ser uno de: ensayo, inscripcion, resultados, cierre_plazo, generico. fecha en formato YYYY-MM-DD. avisos_dias es opcional: si lo omites, el bot usa un default según el tipo (ver README).",
+
+  "eventos": [
+    {
+      "id": "ensayo-nacional-1-2026",
+      "tipo": "ensayo",
+      "titulo": "1er Ensayo Nacional PAES",
+      "fecha": "2026-08-15",
+      "hora": "09:00",
+      "link": "https://tu-link-aqui.cl",
+      "modalidad": "Online (plataforma DEMRE-like) y presencial en sedes asociadas",
+      "avisos_dias": [14, 7, 1, 0]
+    },
+    {
+      "id": "inscripcion-paes-2027",
+      "tipo": "inscripcion",
+      "titulo": "Inscripción PAES Admisión 2027",
+      "fecha": "2026-09-01",
+      "hora": "23:59",
+      "link": "https://acceso.mineduc.cl",
+      "modalidad": "Online",
+      "avisos_dias": [14, 7, 3, 1, 0]
+    },
+    {
+      "id": "resultados-ensayo-1-2026",
+      "tipo": "resultados",
+      "titulo": "Resultados 1er Ensayo Nacional PAES",
+      "fecha": "2026-08-22",
+      "hora": "12:00",
+      "link": "https://tu-link-aqui.cl/resultados",
+      "modalidad": "",
+      "avisos_dias": [0]
+    },
+    {
+      "id": "cierre-inscripcion-paes-2027",
+      "tipo": "cierre_plazo",
+      "titulo": "Cierre de Inscripción PAES Admisión 2027",
+      "fecha": "2026-09-01",
+      "hora": "23:59",
+      "link": "https://acceso.mineduc.cl",
+      "modalidad": "",
+      "avisos_dias": [3, 1, 0]
+    }
+  ]
+}
