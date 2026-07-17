@@ -43,14 +43,7 @@
       "avisos_dias": [3, 1, 0]
     },
     {
-      "id": "prueba-1",
-      "tipo": "ensayo",
-      "titulo": "Evento de Prueba",
-      "fecha": "2026-07-17",
-      "hora": "10:00",
-      "link": "https://discord.com",
-      "modalidad": "Online",
-      "avisos_dias": [0]
+
     },
     {
       "id": "ensayo-st-tomas-2026-08-01",
