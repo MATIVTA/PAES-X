@@ -52,7 +52,7 @@ DEFAULTS_POR_TIPO = {
 # que esto (ej. algo a 5 meses), el bot NO lo anuncia todavía: espera y lo
 # publicará automáticamente el día en que el evento entre en esta ventana,
 # sin que tengas que hacer nada. Ajusta este número si quieres otra ventana.
-UMBRAL_ANUNCIO_INMEDIATO_DIAS = 60
+UMBRAL_ANUNCIO_INMEDIATO_DIAS = 25
 
 EMOJI_TIPO = {
     "ensayo": "📝",
@@ -101,9 +101,9 @@ def campos_evento(evento: dict) -> list:
     fields = [
         {"name": "📅 Fecha", "value": fecha_evento.strftime("%d-%m-%Y"), "inline": True}
     ]
-    if evento.get("hora", "").strip():
+    if (evento.get("hora") or "").strip():
         fields.append({"name": "🕐 Hora", "value": evento["hora"], "inline": True})
-    if evento.get("modalidad", "").strip():
+    if (evento.get("modalidad") or "").strip():
         fields.append({"name": "📍 Modalidad", "value": evento["modalidad"], "inline": True})
     return fields
 
@@ -200,15 +200,41 @@ def msg_generico(evento: dict, dias: int) -> dict:
     return construir_embed(evento, titulo_embed, cuerpo, CIERRE_MOTIVACIONAL, color, "Revisa aquí")
 
 
+def frase_plazo(dias_restantes: int) -> str:
+    if dias_restantes < 0:
+        return "el plazo ya pasó"
+    if dias_restantes == 0:
+        return "es **hoy**"
+    if dias_restantes == 1:
+        return "es **mañana**"
+    return f"quedan **{dias_restantes} días**"
+
+
 def msg_nuevo(evento: dict) -> dict:
     """Embed que se publica el MISMO día en que un evento se agrega
-    a events.json, sin esperar a la cuenta regresiva. Pensado para casos
-    como 'la UOH anunció hoy un ensayo en 1 mes con cupos limitados'."""
+    a events.json (si está dentro de la ventana de anuncio inmediato).
+    Da contexto explícito de cuánto falta y el estado real del plazo,
+    para que no se preste a confusión (ej. que un 'cierre de inscripción'
+    no se lea como si ya hubiera cerrado)."""
     titulo = evento["titulo"]
     tipo = evento.get("tipo", "generico")
-    titulo_embed = f"🆕 ¡Nuevo evento anunciado! — {titulo}"
+    fecha_evento = date.fromisoformat(evento["fecha"])
+    dias_restantes = (fecha_evento - hoy()).days
+    plazo = frase_plazo(dias_restantes)
 
-    cuerpo = "Se acaba de agregar un nuevo evento a la agenda PAES X."
+    titulo_embed = f"🆕 Nuevo en la agenda — {titulo}"
+
+    if tipo == "inscripcion":
+        cuerpo = f"Ya puedes inscribirte — {plazo} para hacerlo, no se ha cerrado el plazo."
+    elif tipo == "cierre_plazo":
+        cuerpo = f"Este es el plazo límite de este trámite. **Aún no se cierra** — {plazo}."
+    elif tipo == "ensayo":
+        cuerpo = f"Se agregó un nuevo ensayo a la agenda — {plazo} para rendirlo."
+    elif tipo == "resultados":
+        cuerpo = f"Ya está agendada la fecha de publicación de resultados — {plazo}."
+    else:
+        cuerpo = f"Se agregó un nuevo evento a la agenda — {plazo}."
+
     if tipo in ("ensayo", "inscripcion"):
         cuerpo += (
             "\n\n⚠️ Los cupos suelen ser limitados y se agotan rápido — "
