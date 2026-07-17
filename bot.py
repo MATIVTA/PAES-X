@@ -82,6 +82,17 @@ CIERRE_URGENCIA = "⚠️ **No te quedes fuera.** Revisa que todo esté en orden
 FOOTER = {"text": "PAES X · Admisión 2027"}
 
 
+MESES_ES = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+]
+
+
+def fecha_larga(fecha_evento: date) -> str:
+    """Ej: 22 de julio de 2026"""
+    return f"{fecha_evento.day} de {MESES_ES[fecha_evento.month - 1]} de {fecha_evento.year}"
+
+
 def hoy() -> date:
     if TZ:
         return datetime.now(TZ).date()
@@ -99,7 +110,7 @@ def dias_texto(dias: int) -> str:
 def campos_evento(evento: dict) -> list:
     fecha_evento = date.fromisoformat(evento["fecha"])
     fields = [
-        {"name": "📅 Fecha", "value": fecha_evento.strftime("%d-%m-%Y"), "inline": True}
+        {"name": "📅 Fecha", "value": fecha_larga(fecha_evento), "inline": True}
     ]
     if (evento.get("hora") or "").strip():
         fields.append({"name": "🕐 Hora", "value": evento["hora"], "inline": True})
@@ -127,21 +138,36 @@ def construir_embed(evento: dict, titulo_embed: str, cuerpo: str, cierre: str,
 def msg_ensayo(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
     color = COLOR_TIPO["ensayo"]
+    fecha_evento = date.fromisoformat(evento["fecha"])
+    fecha_txt = fecha_larga(fecha_evento)
+
     if dias == 0:
-        titulo_embed = f"📝 ¡HOY es el {titulo}!"
-        cuerpo = "Es tu momento de poner a prueba tu preparación. Respira, confía en tu proceso y da lo mejor de ti."
+        titulo_embed = f"📝 ¡Hoy rindes el {titulo}!"
+        cuerpo = (
+            "Hoy es el gran día. Ya hiciste tu preparación — ahora toca confiar "
+            "en ti mismo y dar lo mejor. Lleva tus materiales y llega con tiempo."
+        )
         cierre = CIERRE_COMUNIDAD
     elif dias == 1:
-        titulo_embed = f"📝 Mañana rinden el {titulo}"
-        cuerpo = "Último día para repasar con calma: duerme bien, prepara tus materiales y llega con tiempo."
+        titulo_embed = f"📝 Mañana rindes el {titulo}"
+        cuerpo = (
+            f"Mañana, **{fecha_txt}**, es el día. Aprovecha hoy para un último "
+            "repaso liviano, descansar bien y dejar todo listo para mañana."
+        )
         cierre = CIERRE_MOTIVACIONAL
     elif dias <= 7:
         titulo_embed = f"📝 {titulo} — {dias_texto(dias)}"
-        cuerpo = "Es un buen momento para reforzar tus áreas más débiles y hacer un repaso general."
+        cuerpo = (
+            f"El **{fecha_txt}** rindes el {titulo}. Buen momento para reforzar "
+            "tus puntos más débiles con un repaso enfocado, sin agobiarte."
+        )
         cierre = CIERRE_MOTIVACIONAL
     else:
         titulo_embed = f"📝 {titulo} — {dias_texto(dias)}"
-        cuerpo = "Todavía tienes tiempo de sobra para organizar un plan de estudio y prepararte con calma."
+        cuerpo = (
+            f"El **{fecha_txt}** se realiza el {titulo}. Todavía tienes tiempo "
+            "de sobra para armar un plan de estudio ordenado y llegar preparado."
+        )
         cierre = CIERRE_MOTIVACIONAL
 
     return construir_embed(evento, titulo_embed, cuerpo, cierre, color, "Revisa aquí")
@@ -150,17 +176,29 @@ def msg_ensayo(evento: dict, dias: int) -> dict:
 def msg_inscripcion(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
     color = COLOR_TIPO["inscripcion"]
+    fecha_evento = date.fromisoformat(evento["fecha"])
+    fecha_txt = fecha_larga(fecha_evento)
+
     if dias == 0:
-        titulo_embed = f"📋 ¡ÚLTIMO DÍA para {titulo}!"
-        cuerpo = "Si aún no te has inscrito, hazlo ahora mismo. Después de hoy ya no podrás hacerlo."
+        titulo_embed = f"📋 ¡Último día para {titulo}!"
+        cuerpo = (
+            f"Hoy, **{fecha_txt}**, es el último día para inscribirte. Si todavía "
+            "no lo haces, este es el momento — después de hoy ya no vas a poder."
+        )
         cierre = CIERRE_URGENCIA
     elif dias == 1:
         titulo_embed = f"📋 Mañana cierra: {titulo}"
-        cuerpo = "Queda un día. No dejes pasar el plazo, revisa que tengas todos tus documentos listos."
+        cuerpo = (
+            f"Mañana, **{fecha_txt}**, cierra la inscripción. Revisa que tengas "
+            "todos tus documentos listos para no quedarte fuera por algo evitable."
+        )
         cierre = CIERRE_URGENCIA
     else:
         titulo_embed = f"📋 {titulo} — {dias_texto(dias)}"
-        cuerpo = "Aquí tienes toda la información para inscribirte con tiempo y sin apuro."
+        cuerpo = (
+            f"Puedes inscribirte hasta el **{fecha_txt}**. Te dejamos el link "
+            "para que lo hagas con tiempo y sin apuro."
+        )
         cierre = CIERRE_ACCION
 
     return construir_embed(evento, titulo_embed, cuerpo, cierre, color, "Inscríbete aquí")
@@ -169,8 +207,13 @@ def msg_inscripcion(evento: dict, dias: int) -> dict:
 def msg_resultados(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
     color = COLOR_TIPO["resultados"]
+    fecha_evento = date.fromisoformat(evento["fecha"])
+    fecha_txt = fecha_larga(fecha_evento)
     titulo_embed = f"📊 ¡Ya están disponibles los {titulo}!"
-    cuerpo = "Este es un buen momento para revisar tu desempeño, identificar qué reforzar y seguir avanzando."
+    cuerpo = (
+        f"Se publicaron hoy, **{fecha_txt}**. Es un buen momento para revisar "
+        "cómo te fue, identificar qué reforzar y seguir avanzando en tu preparación."
+    )
 
     return construir_embed(evento, titulo_embed, cuerpo, CIERRE_COMUNIDAD, color, "Consulta tus resultados aquí")
 
@@ -178,15 +221,27 @@ def msg_resultados(evento: dict, dias: int) -> dict:
 def msg_cierre_plazo(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
     color = COLOR_TIPO["cierre_plazo"]
+    fecha_evento = date.fromisoformat(evento["fecha"])
+    fecha_txt = fecha_larga(fecha_evento)
+
     if dias == 0:
-        titulo_embed = f"⏰ ¡HOY vence el plazo de {titulo}!"
-        cuerpo = "Es tu última oportunidad. Si te falta algún trámite, hazlo ahora."
+        titulo_embed = f"⏰ ¡Hoy vence el plazo de {titulo}!"
+        cuerpo = (
+            f"Hoy, **{fecha_txt}**, vence el plazo. Es tu última oportunidad — "
+            "si te falta algún trámite, complétalo ahora."
+        )
     elif dias == 1:
         titulo_embed = f"⏰ Mañana vence: {titulo}"
-        cuerpo = "Queda muy poco tiempo. Verifica que no te falte nada."
+        cuerpo = (
+            f"Mañana, **{fecha_txt}**, vence el plazo. Queda muy poco tiempo, "
+            "verifica que no te falte nada."
+        )
     else:
         titulo_embed = f"⏰ {titulo} — {dias_texto(dias)}"
-        cuerpo = "Ve organizando lo que necesites para no dejarlo para el final."
+        cuerpo = (
+            f"El plazo vence el **{fecha_txt}**. Ve organizando lo que "
+            "necesites para no dejarlo para el último momento."
+        )
 
     return construir_embed(evento, titulo_embed, cuerpo, CIERRE_URGENCIA, color, "Revisa aquí")
 
@@ -194,8 +249,10 @@ def msg_cierre_plazo(evento: dict, dias: int) -> dict:
 def msg_generico(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
     color = COLOR_TIPO["generico"]
+    fecha_evento = date.fromisoformat(evento["fecha"])
+    fecha_txt = fecha_larga(fecha_evento)
     titulo_embed = f"📌 {titulo} — {dias_texto(dias)}"
-    cuerpo = "Aquí tienes los detalles de este evento."
+    cuerpo = f"Este evento se realiza el **{fecha_txt}**. Aquí tienes los detalles."
 
     return construir_embed(evento, titulo_embed, cuerpo, CIERRE_MOTIVACIONAL, color, "Revisa aquí")
 
@@ -213,27 +270,34 @@ def frase_plazo(dias_restantes: int) -> str:
 def msg_nuevo(evento: dict) -> dict:
     """Embed que se publica el MISMO día en que un evento se agrega
     a events.json (si está dentro de la ventana de anuncio inmediato).
-    Da contexto explícito de cuánto falta y el estado real del plazo,
+    Da contexto explícito de la fecha y el estado real del plazo,
     para que no se preste a confusión (ej. que un 'cierre de inscripción'
     no se lea como si ya hubiera cerrado)."""
     titulo = evento["titulo"]
     tipo = evento.get("tipo", "generico")
     fecha_evento = date.fromisoformat(evento["fecha"])
+    fecha_txt = fecha_larga(fecha_evento)
     dias_restantes = (fecha_evento - hoy()).days
     plazo = frase_plazo(dias_restantes)
 
     titulo_embed = f"🆕 Nuevo en la agenda — {titulo}"
 
     if tipo == "inscripcion":
-        cuerpo = f"Ya puedes inscribirte — {plazo} para hacerlo, no se ha cerrado el plazo."
+        cuerpo = (
+            f"Ya puedes inscribirte. El plazo cierra el **{fecha_txt}** "
+            f"({plazo} para hacerlo) — todavía no se ha cerrado."
+        )
     elif tipo == "cierre_plazo":
-        cuerpo = f"Este es el plazo límite de este trámite. **Aún no se cierra** — {plazo}."
+        cuerpo = (
+            f"Este es el plazo límite de este trámite: **{fecha_txt}**. "
+            f"**Aún no se cierra** — {plazo}."
+        )
     elif tipo == "ensayo":
-        cuerpo = f"Se agregó un nuevo ensayo a la agenda — {plazo} para rendirlo."
+        cuerpo = f"Se agregó un nuevo ensayo a la agenda. Se rinde el **{fecha_txt}** ({plazo})."
     elif tipo == "resultados":
-        cuerpo = f"Ya está agendada la fecha de publicación de resultados — {plazo}."
+        cuerpo = f"Ya está agendada la publicación de resultados para el **{fecha_txt}** ({plazo})."
     else:
-        cuerpo = f"Se agregó un nuevo evento a la agenda — {plazo}."
+        cuerpo = f"Se agregó un nuevo evento a la agenda, programado para el **{fecha_txt}** ({plazo})."
 
     if tipo in ("ensayo", "inscripcion"):
         cuerpo += (
