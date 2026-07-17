@@ -293,11 +293,11 @@ def msg_nuevo(evento: dict) -> dict:
             f"**Aún no se cierra** — {plazo}."
         )
     elif tipo == "ensayo":
-        cuerpo = f"Se agregó un nuevo ensayo a la agenda. Se rinde el **{fecha_txt}** ({plazo})."
+        cuerpo = f"Se rinde el **{fecha_txt}** ({plazo})."
     elif tipo == "resultados":
         cuerpo = f"Ya está agendada la publicación de resultados para el **{fecha_txt}** ({plazo})."
     else:
-        cuerpo = f"Se agregó un nuevo evento a la agenda, programado para el **{fecha_txt}** ({plazo})."
+        cuerpo = f"Programado para el **{fecha_txt}** ({plazo})."
 
     if tipo in ("ensayo", "inscripcion"):
         cuerpo += (
