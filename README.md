@@ -56,6 +56,7 @@ Campos de cada evento:
 | `link`        | Sí          | URL de inscripción / información / resultados.                       |
 | `modalidad`   | No          | Ej. `"Online"`, `"Presencial en tu liceo"`. Déjalo `""` si no aplica. |
 | `avisos_dias` | No          | Lista de días de anticipación, ej. `[14, 7, 1, 0]`. Si lo omites, se usa un default según el tipo (ver tabla abajo). |
+| `anuncio_inmediato` | No    | `true` / `false`. Por defecto (si no lo defines) el bot decide solo: anuncia el mismo día en que agregas el evento **solo si** faltan 60 días o menos para la fecha. Si faltan más, espera y lo anuncia automáticamente el día en que el evento entre en esa ventana. Pon `true` para forzar el anuncio inmediato sin importar cuánto falte, o `false` para que nunca se anuncie de forma inmediata (solo cuenta regresiva). |
 
 ### Defaults de anticipación por tipo (si no defines `avisos_dias`)
 
