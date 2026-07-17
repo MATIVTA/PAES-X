@@ -3,58 +3,94 @@
 
   "eventos": [
     {
-      "id": "ensayo-nacional-1-2026",
-      "tipo": "ensayo",
-      "titulo": "1er Ensayo Nacional PAES",
-      "fecha": "2026-08-15",
-      "hora": "09:00",
-      "link": "https://tu-link-aqui.cl",
-      "modalidad": "Online (plataforma DEMRE-like) y presencial en sedes asociadas",
-      "avisos_dias": [14, 7, 1, 0]
-    },
-    {
-      "id": "inscripcion-paes-2027",
-      "tipo": "inscripcion",
-      "titulo": "Inscripción PAES Admisión 2027",
-      "fecha": "2026-09-01",
-      "hora": "23:59",
-      "link": "https://acceso.mineduc.cl",
-      "modalidad": "Online",
-      "avisos_dias": [14, 7, 3, 1, 0]
-    },
-    {
-      "id": "resultados-ensayo-1-2026",
-      "tipo": "resultados",
-      "titulo": "Resultados 1er Ensayo Nacional PAES",
-      "fecha": "2026-08-22",
-      "hora": "12:00",
-      "link": "https://tu-link-aqui.cl/resultados",
-      "modalidad": "",
-      "avisos_dias": [0]
-    },
-    {
-      "id": "cierre-inscripcion-paes-2027",
-      "tipo": "cierre_plazo",
-      "titulo": "Cierre de Inscripción PAES Admisión 2027",
-      "fecha": "2026-09-01",
-      "hora": "23:59",
-      "link": "https://acceso.mineduc.cl",
-      "modalidad": "",
-      "avisos_dias": [3, 1, 0]
-    },
-    {
-
-    },
-    {
-      "id": "ensayo-st-tomas-2026-08-01",
+      "id": "ensayo-uc-2026-08-01-presencial",
       "tipo": "ensayo_institucional",
-      "titulo": "Ensayo Nacional PAES Santo Tomás",
+      "titulo": "2° Ensayo PAES UC 2026 – versión presencial",
+      "fecha": "2026-08-01",
+      "hora": "08:00",
+      "link": "https://admision.uc.cl/informacion-para/futuro-estudiante-de-pregrado/ensayos-paes-uc/",
+      "modalidad": "Presencial",
+      "avisos_dias": [-14, -7, -1, 0]
+    },
+    {
+      "id": "ensayo-uc-2026-08-01-online",
+      "tipo": "ensayo_institucional",
+      "titulo": "2° Ensayo PAES UC 2026 – versión online (1 al 6 de agosto)",
       "fecha": "2026-08-01",
       "hora": "09:00",
-      "link": "https://ensayo.santotomas.cl/",
-      "modalidad": "Presencial",
-      "origen": "universidad",
+      "link": "https://admision.uc.cl/informacion-para/futuro-estudiante-de-pregrado/ensayos-paes-uc/",
+      "modalidad": "Online",
       "avisos_dias": [-14, -7, -1, 0]
-    }
+    },
+    {
+      "id": "uah-talleres-invierno-2026-08-08",
+      "tipo": "taller_vocacional",
+      "titulo": "UAH – Talleres de Invierno y stands informativos",
+      "fecha": "2026-08-08",
+      "hora": "09:00",
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "modalidad": "Presencial",
+      "avisos_dias": [-14, -7, -1, 0]
+    },
+    {
+      "id": "uah-feria-siad-2026-09-23",
+      "tipo": "feria_vocacional",
+      "titulo": "UAH – Stand en Feria SIAD Santiago (Estación Mapocho)",
+      "fecha": "2026-09-23",
+      "hora": "09:00",
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "modalidad": "Presencial",
+      "avisos_dias": [-14, -7, -1, 0]
+    },
+    {
+      "id": "uah-feria-siad-2026-09-24",
+      "tipo": "feria_vocacional",
+      "titulo": "UAH – Stand en Feria SIAD Santiago (día 2)",
+      "fecha": "2026-09-24",
+      "hora": "09:00",
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "modalidad": "Presencial",
+      "avisos_dias": [-14, -7, -1, 0]
+    },
+    {
+      "id": "uah-feria-siad-2026-09-25",
+      "tipo": "feria_vocacional",
+      "titulo": "UAH – Stand en Feria SIAD Santiago (día 3)",
+      "fecha": "2026-09-25",
+      "hora": "09:00",
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "modalidad": "Presencial",
+      "avisos_dias": [-14, -7, -1, 0]
+    },
+    {
+      "id": "uah-conversatorio-virtual-2026-09-29",
+      "tipo": "charla_online",
+      "titulo": "UAH Virtual – Conversatorio con docentes y directores de carrera",
+      "fecha": "2026-09-29",
+      "hora": "18:00",
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "modalidad": "Online",
+      "avisos_dias": [-14, -7, -1, 0]
+    },
+    {
+      "id": "uah-ensayo-paes-2026-10-03",
+      "tipo": "ensayo_institucional",
+      "titulo": "UAH Abierta – Ensayo PAES + Feria de carreras y tour patrimonial",
+      "fecha": "2026-10-03",
+      "hora": "10:00",
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "modalidad": "Presencial",
+      "avisos_dias": [-14, -7, -1, 0]
+    },
+    {
+      "id": "uah-talleres-primavera-2026-11-14",
+      "tipo": "taller_vocacional",
+      "titulo": "UAH – Talleres de Primavera y experiencia universitaria",
+      "fecha": "2026-11-14",
+      "hora": "09:00",
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "modalidad": "Presencial",
+      "avisos_dias": [-14, -7, -1, 0]
+    }   
   ]
 }
