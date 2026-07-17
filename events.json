@@ -51,6 +51,17 @@
       "link": "https://discord.com",
       "modalidad": "Online",
       "avisos_dias": [0]
+    },
+    {
+      "id": "ensayo-st-tomas-2026-08-01",
+      "tipo": "ensayo_institucional",
+      "titulo": "Ensayo Nacional PAES Santo Tomás",
+      "fecha": "2026-08-01",
+      "hora": "09:00",
+      "link": "https://ensayo.santotomas.cl/",
+      "modalidad": "Presencial",
+      "origen": "universidad",
+      "avisos_dias": [-14, -7, -1, 0]
     }
   ]
 }
