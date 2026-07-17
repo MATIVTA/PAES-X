@@ -4,11 +4,14 @@ PAES X - Bot de avisos automáticos para el canal #eventos-paes
 ----------------------------------------------------------------
 Este script:
 1. Lee events.json (la lista de eventos PAES).
-2. Calcula si HOY corresponde publicar un aviso para algún evento,
-   según su tipo y las reglas de anticipación (avisos_dias).
-3. Genera un mensaje distinto según el tipo de evento y la cercanía.
-4. Lo publica en Discord vía Webhook.
-5. Registra en sent_log.json lo que ya se envió, para no repetirlo.
+2. Detecta eventos nuevos (nunca anunciados) y publica un anuncio
+   inmediato el mismo día en que se agregan, sin esperar a la cuenta
+   regresiva (útil cuando hay cupos limitados).
+3. Calcula si HOY corresponde publicar un recordatorio de cuenta
+   regresiva para algún evento, según su tipo y avisos_dias.
+4. Genera un embed distinto según el tipo de evento y la cercanía.
+5. Lo publica en Discord vía Webhook.
+6. Registra en sent_log.json lo que ya se envió, para no repetirlo.
 
 No requiere librerías externas (solo la librería estándar de Python),
 para que el workflow de GitHub Actions no tenga que instalar nada.
@@ -52,12 +55,24 @@ EMOJI_TIPO = {
     "generico": "📌",
 }
 
+# Colores de la barra lateral del embed, decimal (hex -> decimal)
+COLOR_TIPO = {
+    "ensayo": 3447003,       # azul
+    "inscripcion": 3066993,  # verde
+    "resultados": 10181046,  # morado
+    "cierre_plazo": 15158332,  # rojo
+    "generico": 9807270,     # gris
+}
+COLOR_NUEVO = 15844367  # dorado, para destacar el anuncio de evento nuevo
+
 CIERRE_COMUNIDAD = (
     f"Cuéntennos en <#{CANAL_GENERAL_ID}> o en <#{CANAL_METAS_ID}> cómo les fue."
 )
 CIERRE_MOTIVACIONAL = "**PAES X** — Tu esfuerzo de hoy es tu cupo de mañana. 💪"
 CIERRE_ACCION = "No dejes todo para el último momento, organízate desde ya. 🚀"
 CIERRE_URGENCIA = "⚠️ **No te quedes fuera.** Revisa que todo esté en orden."
+
+FOOTER = {"text": "PAES X · Admisión 2027"}
 
 
 def hoy() -> date:
@@ -74,160 +89,126 @@ def dias_texto(dias: int) -> str:
     return f"en {dias} días"
 
 
-def linea_modalidad(evento: dict) -> str:
-    modalidad = evento.get("modalidad", "").strip()
-    if not modalidad:
-        return ""
-    return f"📍 Modalidad: {modalidad}\n"
+def campos_evento(evento: dict) -> list:
+    fecha_evento = date.fromisoformat(evento["fecha"])
+    fields = [
+        {"name": "📅 Fecha", "value": fecha_evento.strftime("%d-%m-%Y"), "inline": True}
+    ]
+    if evento.get("hora", "").strip():
+        fields.append({"name": "🕐 Hora", "value": evento["hora"], "inline": True})
+    if evento.get("modalidad", "").strip():
+        fields.append({"name": "📍 Modalidad", "value": evento["modalidad"], "inline": True})
+    return fields
 
 
-def linea_hora(evento: dict) -> str:
-    hora = evento.get("hora", "").strip()
-    if not hora:
-        return ""
-    return f"🕐 Hora: {hora}\n"
+def construir_embed(evento: dict, titulo_embed: str, cuerpo: str, cierre: str,
+                     color: int, link_texto: str = "Revisa aquí") -> dict:
+    link = evento["link"]
+    descripcion = f"{cuerpo}\n\n🔗 [{link_texto}]({link})\n\n{cierre}"
+    return {
+        "title": titulo_embed,
+        "url": link,  # hace que el título del embed también sea clickeable
+        "description": descripcion,
+        "color": color,
+        "fields": campos_evento(evento),
+        "footer": FOOTER,
+    }
 
 
 # ---------- Plantillas por tipo de evento ----------
 
-def msg_ensayo(evento: dict, dias: int) -> str:
+def msg_ensayo(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
-    link = evento["link"]
+    color = COLOR_TIPO["ensayo"]
     if dias == 0:
-        cabecera = f"📝 **¡HOY es el {titulo}!**"
+        titulo_embed = f"📝 ¡HOY es el {titulo}!"
         cuerpo = "Es tu momento de poner a prueba tu preparación. Respira, confía en tu proceso y da lo mejor de ti."
         cierre = CIERRE_COMUNIDAD
     elif dias == 1:
-        cabecera = f"📝 **Mañana rinden el {titulo}**"
+        titulo_embed = f"📝 Mañana rinden el {titulo}"
         cuerpo = "Último día para repasar con calma: duerme bien, prepara tus materiales y llega con tiempo."
         cierre = CIERRE_MOTIVACIONAL
     elif dias <= 7:
-        cabecera = f"📝 **{titulo} — {dias_texto(dias)}**"
+        titulo_embed = f"📝 {titulo} — {dias_texto(dias)}"
         cuerpo = "Es un buen momento para reforzar tus áreas más débiles y hacer un repaso general."
         cierre = CIERRE_MOTIVACIONAL
     else:
-        cabecera = f"📝 **{titulo} — {dias_texto(dias)}**"
+        titulo_embed = f"📝 {titulo} — {dias_texto(dias)}"
         cuerpo = "Todavía tienes tiempo de sobra para organizar un plan de estudio y prepararte con calma."
         cierre = CIERRE_MOTIVACIONAL
 
-    return (
-        f"{cabecera}\n\n"
-        f"{cuerpo}\n"
-        f"{linea_hora(evento)}"
-        f"{linea_modalidad(evento)}\n"
-        f"🔗 [Revisa aquí]({link})\n\n"
-        f"{cierre}"
-    )
+    return construir_embed(evento, titulo_embed, cuerpo, cierre, color, "Revisa aquí")
 
 
-def msg_inscripcion(evento: dict, dias: int) -> str:
+def msg_inscripcion(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
-    link = evento["link"]
+    color = COLOR_TIPO["inscripcion"]
     if dias == 0:
-        cabecera = f"📋 **¡ÚLTIMO DÍA para {titulo}!**"
+        titulo_embed = f"📋 ¡ÚLTIMO DÍA para {titulo}!"
         cuerpo = "Si aún no te has inscrito, hazlo ahora mismo. Después de hoy ya no podrás hacerlo."
         cierre = CIERRE_URGENCIA
     elif dias == 1:
-        cabecera = f"📋 **Mañana cierra: {titulo}**"
+        titulo_embed = f"📋 Mañana cierra: {titulo}"
         cuerpo = "Queda un día. No dejes pasar el plazo, revisa que tengas todos tus documentos listos."
         cierre = CIERRE_URGENCIA
     else:
-        cabecera = f"📋 **{titulo} — {dias_texto(dias)}**"
+        titulo_embed = f"📋 {titulo} — {dias_texto(dias)}"
         cuerpo = "Aquí tienes toda la información para inscribirte con tiempo y sin apuro."
         cierre = CIERRE_ACCION
 
-    return (
-        f"{cabecera}\n\n"
-        f"{cuerpo}\n"
-        f"{linea_hora(evento)}"
-        f"{linea_modalidad(evento)}\n"
-        f"🔗 [Inscríbete aquí]({link})\n\n"
-        f"{cierre}"
-    )
+    return construir_embed(evento, titulo_embed, cuerpo, cierre, color, "Inscríbete aquí")
 
 
-def msg_resultados(evento: dict, dias: int) -> str:
+def msg_resultados(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
-    link = evento["link"]
-    cabecera = f"📊 **¡Ya están disponibles los {titulo}!**"
+    color = COLOR_TIPO["resultados"]
+    titulo_embed = f"📊 ¡Ya están disponibles los {titulo}!"
     cuerpo = "Este es un buen momento para revisar tu desempeño, identificar qué reforzar y seguir avanzando."
 
-    return (
-        f"{cabecera}\n\n"
-        f"{cuerpo}\n"
-        f"{linea_hora(evento)}\n"
-        f"🔗 [Consulta tus resultados aquí]({link})\n\n"
-        f"{CIERRE_COMUNIDAD}"
-    )
+    return construir_embed(evento, titulo_embed, cuerpo, CIERRE_COMUNIDAD, color, "Consulta tus resultados aquí")
 
 
-def msg_cierre_plazo(evento: dict, dias: int) -> str:
+def msg_cierre_plazo(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
-    link = evento["link"]
+    color = COLOR_TIPO["cierre_plazo"]
     if dias == 0:
-        cabecera = f"⏰ **¡HOY vence el plazo de {titulo}!**"
+        titulo_embed = f"⏰ ¡HOY vence el plazo de {titulo}!"
         cuerpo = "Es tu última oportunidad. Si te falta algún trámite, hazlo ahora."
     elif dias == 1:
-        cabecera = f"⏰ **Mañana vence: {titulo}**"
+        titulo_embed = f"⏰ Mañana vence: {titulo}"
         cuerpo = "Queda muy poco tiempo. Verifica que no te falte nada."
     else:
-        cabecera = f"⏰ **{titulo} — {dias_texto(dias)}**"
+        titulo_embed = f"⏰ {titulo} — {dias_texto(dias)}"
         cuerpo = "Ve organizando lo que necesites para no dejarlo para el final."
 
-    return (
-        f"{cabecera}\n\n"
-        f"{cuerpo}\n"
-        f"{linea_hora(evento)}\n"
-        f"🔗 [Revisa aquí]({link})\n\n"
-        f"{CIERRE_URGENCIA}"
-    )
+    return construir_embed(evento, titulo_embed, cuerpo, CIERRE_URGENCIA, color, "Revisa aquí")
 
 
-def msg_generico(evento: dict, dias: int) -> str:
+def msg_generico(evento: dict, dias: int) -> dict:
     titulo = evento["titulo"]
-    link = evento["link"]
-    cabecera = f"📌 **{titulo} — {dias_texto(dias)}**"
-    return (
-        f"{cabecera}\n\n"
-        f"{linea_hora(evento)}"
-        f"{linea_modalidad(evento)}\n"
-        f"🔗 [Revisa aquí]({link})\n\n"
-        f"{CIERRE_MOTIVACIONAL}"
-    )
+    color = COLOR_TIPO["generico"]
+    titulo_embed = f"📌 {titulo} — {dias_texto(dias)}"
+    cuerpo = "Aquí tienes los detalles de este evento."
+
+    return construir_embed(evento, titulo_embed, cuerpo, CIERRE_MOTIVACIONAL, color, "Revisa aquí")
 
 
-def msg_nuevo(evento: dict) -> str:
-    """Mensaje que se publica el MISMO día en que un evento se agrega
+def msg_nuevo(evento: dict) -> dict:
+    """Embed que se publica el MISMO día en que un evento se agrega
     a events.json, sin esperar a la cuenta regresiva. Pensado para casos
     como 'la UOH anunció hoy un ensayo en 1 mes con cupos limitados'."""
     titulo = evento["titulo"]
-    link = evento["link"]
     tipo = evento.get("tipo", "generico")
-    emoji = EMOJI_TIPO.get(tipo, "📌")
+    titulo_embed = f"🆕 ¡Nuevo evento anunciado! — {titulo}"
 
-    fecha_evento = date.fromisoformat(evento["fecha"])
-    fecha_str = fecha_evento.strftime("%d-%m-%Y")
-
-    cabecera = f"🆕 {emoji} **¡Nuevo evento anunciado!**\n**{titulo}**"
-
-    cuerpo = f"📅 Fecha: {fecha_str}\n"
-    cuerpo += linea_hora(evento)
-    cuerpo += linea_modalidad(evento)
-
-    aviso_cupos = ""
+    cuerpo = "Se acaba de agregar un nuevo evento a la agenda PAES X."
     if tipo in ("ensayo", "inscripcion"):
-        aviso_cupos = (
-            "⚠️ Los cupos suelen ser limitados y se agotan rápido — "
-            "no esperes a último momento para inscribirte.\n\n"
+        cuerpo += (
+            "\n\n⚠️ Los cupos suelen ser limitados y se agotan rápido — "
+            "no esperes a último momento para inscribirte."
         )
 
-    return (
-        f"{cabecera}\n\n"
-        f"{cuerpo}\n"
-        f"{aviso_cupos}"
-        f"🔗 [Inscríbete/Revisa aquí]({link})\n\n"
-        f"{CIERRE_ACCION}"
-    )
+    return construir_embed(evento, titulo_embed, cuerpo, CIERRE_ACCION, COLOR_NUEVO, "Inscríbete/Revisa aquí")
 
 
 CONSTRUCTORES = {
@@ -239,19 +220,19 @@ CONSTRUCTORES = {
 }
 
 
-def construir_mensaje(evento: dict, dias: int) -> str:
+def construir_mensaje(evento: dict, dias: int) -> dict:
     tipo = evento.get("tipo", "generico")
     fn = CONSTRUCTORES.get(tipo, msg_generico)
     return fn(evento, dias)
 
 
-def enviar_webhook(mensaje: str) -> None:
+def enviar_webhook(embed: dict) -> None:
     webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
     if not webhook_url:
         print("ERROR: falta la variable de entorno DISCORD_WEBHOOK_URL", file=sys.stderr)
         sys.exit(1)
 
-    payload = json.dumps({"content": mensaje}).encode("utf-8")
+    payload = json.dumps({"embeds": [embed]}).encode("utf-8")
     req = urllib.request.Request(
         webhook_url,
         data=payload,
@@ -325,9 +306,9 @@ def main():
             if log.get(key):
                 continue  # ya enviado antes, no duplicar
 
-            mensaje = construir_mensaje(evento, dias)
+            embed = construir_mensaje(evento, dias)
             print(f"Enviando aviso: {key}")
-            enviar_webhook(mensaje)
+            enviar_webhook(embed)
             log[key] = True
             enviados += 1
 
