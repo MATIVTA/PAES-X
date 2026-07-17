@@ -30,6 +30,11 @@ except Exception:
 EVENTS_FILE = "events.json"
 LOG_FILE = "sent_log.json"
 
+# IDs de canales para que las menciones sean clickeables de verdad en Discord.
+# Formato real de mención de canal: <#ID>. Cambia estos IDs si mueves los canales.
+CANAL_GENERAL_ID = 1520940545868828735
+CANAL_METAS_ID = 1520940547991273492
+
 # Reglas de anticipación por defecto si un evento no define "avisos_dias"
 DEFAULTS_POR_TIPO = {
     "ensayo": [14, 7, 1, 0],
@@ -48,7 +53,7 @@ EMOJI_TIPO = {
 }
 
 CIERRE_COMUNIDAD = (
-    "Cuéntennos en 💬-general o en 🎯-metas-puntaje cómo les fue."
+    f"Cuéntennos en <#{CANAL_GENERAL_ID}> o en <#{CANAL_METAS_ID}> cómo les fue."
 )
 CIERRE_MOTIVACIONAL = "**PAES X** — Tu esfuerzo de hoy es tu cupo de mañana. 💪"
 CIERRE_ACCION = "No dejes todo para el último momento, organízate desde ya. 🚀"
@@ -191,6 +196,40 @@ def msg_generico(evento: dict, dias: int) -> str:
     )
 
 
+def msg_nuevo(evento: dict) -> str:
+    """Mensaje que se publica el MISMO día en que un evento se agrega
+    a events.json, sin esperar a la cuenta regresiva. Pensado para casos
+    como 'la UOH anunció hoy un ensayo en 1 mes con cupos limitados'."""
+    titulo = evento["titulo"]
+    link = evento["link"]
+    tipo = evento.get("tipo", "generico")
+    emoji = EMOJI_TIPO.get(tipo, "📌")
+
+    fecha_evento = date.fromisoformat(evento["fecha"])
+    fecha_str = fecha_evento.strftime("%d-%m-%Y")
+
+    cabecera = f"🆕 {emoji} **¡Nuevo evento anunciado!**\n**{titulo}**"
+
+    cuerpo = f"📅 Fecha: {fecha_str}\n"
+    cuerpo += linea_hora(evento)
+    cuerpo += linea_modalidad(evento)
+
+    aviso_cupos = ""
+    if tipo in ("ensayo", "inscripcion"):
+        aviso_cupos = (
+            "⚠️ Los cupos suelen ser limitados y se agotan rápido — "
+            "no esperes a último momento para inscribirte.\n\n"
+        )
+
+    return (
+        f"{cabecera}\n\n"
+        f"{cuerpo}\n"
+        f"{aviso_cupos}"
+        f"🔗 [Inscríbete/Revisa aquí]({link})\n\n"
+        f"{CIERRE_ACCION}"
+    )
+
+
 CONSTRUCTORES = {
     "ensayo": msg_ensayo,
     "inscripcion": msg_inscripcion,
@@ -264,6 +303,17 @@ def main():
             continue
 
         tipo = evento.get("tipo", "generico")
+
+        # --- Anuncio inmediato: si este evento nunca se ha anunciado,
+        # se publica HOY sin importar cuántos días falten (útil cuando
+        # un evento se anuncia con poca anticipación y hay cupos limitados). ---
+        key_nuevo = f"{evento.get('id', evento['titulo'])}_nuevo"
+        if not log.get(key_nuevo):
+            print(f"Enviando anuncio de evento nuevo: {key_nuevo}")
+            enviar_webhook(msg_nuevo(evento))
+            log[key_nuevo] = True
+            enviados += 1
+
         avisos_dias = evento.get("avisos_dias") or DEFAULTS_POR_TIPO.get(tipo, [0])
 
         for dias in avisos_dias:
