@@ -293,11 +293,11 @@ def msg_nuevo(evento: dict) -> dict:
             f"**Aún no se cierra** — {plazo}."
         )
     elif tipo == "ensayo":
-        cuerpo = f"Se rinde el **{fecha_txt}** ({plazo})."
+        cuerpo = f"Se agregó un nuevo ensayo a la agenda. Se rinde el **{fecha_txt}** ({plazo})."
     elif tipo == "resultados":
         cuerpo = f"Ya está agendada la publicación de resultados para el **{fecha_txt}** ({plazo})."
     else:
-        cuerpo = f"Programado para el **{fecha_txt}** ({plazo})."
+        cuerpo = f"Se agregó un nuevo evento a la agenda, programado para el **{fecha_txt}** ({plazo})."
 
     if tipo in ("ensayo", "inscripcion"):
         cuerpo += (
@@ -357,7 +357,19 @@ def cargar_json(path: str, default):
     if not os.path.exists(path):
         return default
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        contenido = f.read()
+    if not contenido.strip():
+        return default
+    try:
+        return json.loads(contenido)
+    except json.JSONDecodeError as e:
+        print(
+            f"AVISO: {path} tiene un error de sintaxis JSON ({e}). "
+            "Se usará un valor por defecto para no detener la ejecución. "
+            "Revisa y corrige el archivo (comas de más/menos son la causa más común).",
+            file=sys.stderr,
+        )
+        return default
 
 
 def guardar_json(path: str, data) -> None:
