@@ -1,0 +1,29 @@
+name: Scraper calendario DEMRE
+
+on:
+  schedule:
+    # Todos los lunes a las 13:00 UTC (~09-10 AM Chile). El calendario de
+    # DEMRE no cambia todos los días, así que con 1 vez por semana alcanza.
+    - cron: "0 13 * * 1"
+  workflow_dispatch: {}  # para probarlo manualmente desde la pestaña Actions
+
+permissions:
+  contents: write
+
+jobs:
+  scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Buscar eventos nuevos en el calendario de DEMRE
+        run: python3 scripts/scraper_demre.py
+
+      - name: Commit de eventos nuevos (si los hay)
+        run: |
+          git config user.name "paes-x-bot"
+          git config user.email "actions@github.com"
+          git add events.json
+          git diff --cached --quiet || git commit -m "Auto: nuevos eventos detectados en calendario DEMRE"
+          git diff --cached --quiet || git push

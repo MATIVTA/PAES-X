@@ -1,0 +1,31 @@
+name: Scraper páginas de universidades
+
+on:
+  schedule:
+    # Todos los días a las 13:30 UTC, después del scraper de DEMRE.
+    - cron: "30 13 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Buscar y publicar fechas de ensayos en páginas de universidades
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/scraper_universidades.py
+
+      - name: Commit de eventos nuevos y estado
+        run: |
+          git config user.name "paes-x-bot"
+          git config user.email "actions@github.com"
+          git add events.json watch_state.json
+          git diff --cached --quiet || git commit -m "Auto: eventos y estado detectados en páginas de universidades"
+          git diff --cached --quiet || git push

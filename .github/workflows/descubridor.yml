@@ -1,0 +1,29 @@
+name: Descubridor de páginas de ensayos PAES
+
+on:
+  schedule:
+    # Todos los domingos a las 12:00 UTC. Es una búsqueda, no hace falta
+    # correrla todos los días.
+    - cron: "0 12 * * 0"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  descubridor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Buscar páginas nuevas de ensayos PAES
+        run: python3 scripts/descubridor.py
+
+      - name: Commit de páginas descubiertas
+        run: |
+          git config user.name "paes-x-bot"
+          git config user.email "actions@github.com"
+          git add discovered_pages.json
+          git diff --cached --quiet || git commit -m "Auto: nuevas páginas de ensayos descubiertas"
+          git diff --cached --quiet || git push
