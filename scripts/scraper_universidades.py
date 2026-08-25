@@ -306,11 +306,15 @@ def main() -> int:
             continue
 
         candidatas = extraer_fechas_candidatas(texto, hoy)
+        id_pendiente = f"pendiente-{slug(titulo_limpio)}"
 
         if len(candidatas) == 1:
             fecha, contexto, ini, fin = candidatas[0]
             if evento_ya_existe(titulo_limpio, fecha, eventos):
                 continue
+            # si esta página ya estaba publicada como "fecha por confirmar",
+            # la reemplazamos por la versión definitiva con fecha.
+            eventos[:] = [e for e in eventos if e.get("id") != id_pendiente]
             nuevo_id = f"auto-{slug(titulo_limpio)}-{fecha.isoformat()}"
             modalidad = detectar_modalidad(texto, ini, fin)
             evento_nuevo = {
@@ -329,12 +333,30 @@ def main() -> int:
             print(f"Agregado automáticamente: {nuevo_id}  (\"...{contexto}...\")")
             continue
 
-        # 0 fechas encontradas o varias distintas: no se adivina, se deja
-        # como pendiente de revisión humana (solo si esto es nuevo desde
-        # la última corrida, para no reabrir el mismo Issue cada día).
+        # 0 fechas encontradas o varias distintas: en vez de dejarlo esperando
+        # revisión manual, se publica igual como "fecha por confirmar" (una
+        # sola vez -- si ya existe la versión pendiente, no se duplica).
+        if not any(e.get("id") == id_pendiente for e in eventos):
+            evento_pendiente = {
+                "id": id_pendiente,
+                "tipo": tipo,
+                "titulo": titulo_limpio,
+                "fecha": None,
+                "link": url,
+                "origen": "scraper_universidades",
+            }
+            if len(candidatas) > 1:
+                fechas_listadas = ", ".join(f.strftime("%d-%m-%Y") for f, *_ in candidatas)
+                evento_pendiente["notas"] = f"Fechas mencionadas en la página: {fechas_listadas}"
+            eventos.append(evento_pendiente)
+            agregados += 1
+            print(f"Agregado como pendiente (fecha por confirmar): {id_pendiente}")
+
+        # Issue de respaldo (no es necesario revisarlo -- el aviso ya salió
+        # en Discord -- pero queda como registro por si sirve).
         hash_actual = hashlib.sha256(texto.encode("utf-8")).hexdigest()
         if estado.get(url) == hash_actual:
-            continue  # ya se avisó de esta versión de la página
+            continue
 
         titulo_issue = f"Revisar fecha en: {nombre}"
         if len(candidatas) == 0:
@@ -347,9 +369,9 @@ def main() -> int:
             crear_issue(
                 titulo_issue,
                 f"La página **{nombre}** ({url}) cambió y {motivo}\n\n"
-                "Revisa la página y agrega el evento a mano en `events.json` si corresponde.\n\n"
-                "_Este issue se generó automáticamente porque el scraper no pudo confiar en una "
-                "sola fecha. Ciérralo una vez que lo revises._"
+                "El bot ya publicó esto en Discord como \"fecha por confirmar\", "
+                "así que revisar este Issue es opcional -- solo queda como registro.\n\n"
+                "_Este issue se generó automáticamente. Ciérralo cuando quieras._"
             )
         pendientes += 1
 
