@@ -2,9 +2,9 @@ name: Scraper calendario DEMRE
 
 on:
   schedule:
-    # Todos los lunes a las 13:00 UTC (~09-10 AM Chile). El calendario de
-    # DEMRE no cambia todos los días, así que con 1 vez por semana alcanza.
-    - cron: "0 13 * * 1"
+    # Lunes a las 14:20 UTC. El calendario de DEMRE no cambia todos los
+    # días, así que con 1 vez por semana alcanza.
+    - cron: "20 14 * * 1"
   workflow_dispatch: {}  # para probarlo manualmente desde la pestaña Actions
 
 permissions:
@@ -20,10 +20,25 @@ jobs:
       - name: Buscar eventos nuevos en el calendario de DEMRE
         run: python3 scripts/scraper_demre.py
 
-      - name: Commit de eventos nuevos (si los hay)
+      - name: Commit de eventos nuevos (con reintento si hay choque con otro workflow)
         run: |
           git config user.name "paes-x-bot"
           git config user.email "actions@github.com"
           git add events.json
-          git diff --cached --quiet || git commit -m "Auto: nuevos eventos detectados en calendario DEMRE"
-          git diff --cached --quiet || git push
+          if git diff --cached --quiet; then
+            echo "Nada nuevo que guardar."
+            exit 0
+          fi
+          git commit -m "Auto: nuevos eventos detectados en calendario DEMRE"
+          for intento in 1 2 3 4 5; do
+            if git push; then
+              echo "Push OK."
+              exit 0
+            fi
+            echo "Push rechazado (probablemente otro workflow escribió al mismo tiempo). Reintentando ($intento)..."
+            git fetch origin main
+            git rebase origin/main
+            sleep $((RANDOM % 10 + 3))
+          done
+          echo "ERROR: no se pudo hacer push de events.json tras varios intentos." >&2
+          exit 1
