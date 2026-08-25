@@ -489,6 +489,171 @@
         1,
         0
       ]
+    },
+    {
+      "id": "pendiente-ensayo-paes-santo-tom-s",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES Santo Tomás",
+      "fecha": null,
+      "link": "https://ensayo.santotomas.cl/",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-ensayo-paes-uc",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES UC",
+      "fecha": null,
+      "link": "https://admision.uc.cl/informacion-para/futuro-estudiante-de-pregrado/ensayos-paes-uc/",
+      "origen": "scraper_universidades",
+      "notas": "Fechas mencionadas en la página: 24-07-2027, 01-08-2027, 06-08-2027, 07-08-2027"
+    },
+    {
+      "id": "auto-ensayo-paes-universidad-aut-noma-2026-09-05",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES Universidad Autónoma",
+      "fecha": "2026-09-05",
+      "hora": null,
+      "link": "https://admision.uautonoma.cl/ensayo-paes-gratuito/",
+      "origen": "scraper_universidades",
+      "modalidad": "Presencial"
+    },
+    {
+      "id": "pendiente-ensayo-paes-usm",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES USM",
+      "fecha": null,
+      "link": "https://usm.cl/eventos/ensayo-paes/",
+      "origen": "scraper_universidades",
+      "notas": "Fechas mencionadas en la página: 17-10-2026, 16-05-2027, 01-08-2027"
+    },
+    {
+      "id": "pendiente-uah-actividades-para-postulantes",
+      "tipo": "generico",
+      "titulo": "UAH — Actividades para postulantes",
+      "fecha": null,
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "origen": "scraper_universidades",
+      "notas": "Fechas mencionadas en la página: 29-09-2026, 03-10-2026, 14-11-2026"
+    },
+    {
+      "id": "auto-ensayo-paes-universidad-san-sebasti-n-2026-10-03",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES Universidad San Sebastián",
+      "fecha": "2026-10-03",
+      "hora": null,
+      "link": "https://preuniversitario.uss.cl/ensayo-presencial",
+      "origen": "scraper_universidades",
+      "modalidad": "Presencial"
+    },
+    {
+      "id": "pendiente-ensayo-paes-online-universidad-san-sebasti-n",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES online Universidad San Sebastián",
+      "fecha": null,
+      "link": "https://preuniversitario.uss.cl/ensayo-online",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "auto-ensayo-masivo-paes-unab-pdv-2027-05-09",
+      "tipo": "ensayo",
+      "titulo": "Ensayo Masivo PAES UNAB + PDV",
+      "fecha": "2027-05-09",
+      "hora": null,
+      "link": "https://explora.unab.cl/ensayo-masivo-paes-unab-pdv-2026-inscribete-aqui-y-preparate-con-un-ensayo-presencial-y-gratuito/",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-ensayo-nacional-paes-2026-inscripci-n-gratuita-online-preuca",
+      "tipo": "ensayo",
+      "titulo": "Ensayo Nacional PAES 2026 | Inscripción Gratuita Online | Preucap",
+      "fecha": null,
+      "link": "https://preucap.cl/ensayo-2026",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "auto-paes-de-invierno-2026-prep-rate-con-nuestro-ensayo-masivo-2027-05-09",
+      "tipo": "ensayo",
+      "titulo": "PAES de Invierno 2026: prepárate con nuestro Ensayo Masivo",
+      "fecha": "2027-05-09",
+      "hora": null,
+      "link": "https://explora.unab.cl/paes-de-invierno-2026-una-nueva-oportunidad-para-ingresar-a-la-educacion-superior/",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "auto-ensayo-paes-primavera-2026-inscr-bete-gratis-y-prep-rate-en--2026-09-26",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES Primavera 2026: inscríbete gratis y prepárate en la UGM ...",
+      "fecha": "2026-09-26",
+      "hora": null,
+      "link": "https://admision.ugm.cl/26-09-0900-hrs-ensayo-paes-primavera-2026-inscribete-gratis-y-preparate-en-la-ugm/",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-2do-ensayo-nacional-paes-2026-descargable-gratis-filadd",
+      "tipo": "ensayo",
+      "titulo": "2do Ensayo Nacional PAES 2026 — Descargable Gratis | Filadd",
+      "fecha": null,
+      "link": "https://ensayos-paes.filadd.cl/",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-inscripci-n-ensayo-paes-uc",
+      "tipo": "ensayo",
+      "titulo": "Inscripción Ensayo PAES UC",
+      "fecha": null,
+      "link": "https://admision.uc.cl/informacion-para/futuro-estudiante-de-pregrado/ensayos-paes-uc/ensayo-paes-uc-inscripcion/",
+      "origen": "scraper_universidades",
+      "notas": "Fechas mencionadas en la página: 24-07-2027, 01-08-2027, 06-08-2027"
+    },
+    {
+      "id": "auto-usm-abre-inscripciones-para-su-ensayo-nacional-paes-2026-2027-08-01",
+      "tipo": "ensayo",
+      "titulo": "USM abre inscripciones para su Ensayo Nacional PAES 2026",
+      "fecha": "2027-08-01",
+      "hora": null,
+      "link": "https://usm.cl/noticias/usm-abre-inscripciones-para-su-ensayo-nacional-paes-2026/",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-ensayo-nacional-paes-2026-gratis-preuniversitario-filadd",
+      "tipo": "ensayo",
+      "titulo": "Ensayo Nacional PAES 2026 — Gratis | Preuniversitario Filadd",
+      "fecha": null,
+      "link": "https://ensayospaes.cl/ensayos/ensayo-nacional-paes-2026",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-ranking-nacional-ensayo-paes-2026-filadd",
+      "tipo": "ensayo",
+      "titulo": "Ranking Nacional — Ensayo PAES 2026 | Filadd",
+      "fecha": null,
+      "link": "https://ensayo-nacional.filadd.cl/ranking",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-ensayo-nacional-paes-usm-universidad-t-cnica-federico-santa-",
+      "tipo": "ensayo",
+      "titulo": "Ensayo Nacional PAES USM - Universidad Técnica Federico Santa María",
+      "fecha": null,
+      "link": "https://usm.cl/admision/ensayousm/",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-ensayos-lenguaje-actualizados-2026-paes-2026-admisi-n-2027",
+      "tipo": "ensayo",
+      "titulo": "Ensayos lenguaje actualizados 2026 · PAES 2026 - Admisión 2027",
+      "fecha": null,
+      "link": "https://www.skool.com/comunidad-paes/ensayos-lenguaje-actualizados-2026",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "auto-ensayo-paes-admisi-n-usm-2027-08-01",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES | Admisión USM",
+      "fecha": "2027-08-01",
+      "hora": null,
+      "link": "https://difusion.usm.cl/",
+      "origen": "scraper_universidades"
     }
   ]
 }
