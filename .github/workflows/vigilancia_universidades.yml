@@ -2,8 +2,8 @@ name: Scraper páginas de universidades
 
 on:
   schedule:
-    # Todos los días a las 13:30 UTC, después del scraper de DEMRE.
-    - cron: "30 13 * * *"
+    # Todos los días a las 16:45 UTC (lejos de avisos.yml a las 12:00).
+    - cron: "45 16 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -22,10 +22,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/scraper_universidades.py
 
-      - name: Commit de eventos nuevos y estado
+      - name: Commit de eventos nuevos y estado (con reintento si hay choque con otro workflow)
         run: |
           git config user.name "paes-x-bot"
           git config user.email "actions@github.com"
-          git add events.json watch_state.json
-          git diff --cached --quiet || git commit -m "Auto: eventos y estado detectados en páginas de universidades"
-          git diff --cached --quiet || git push
+          git add events.json watch_state.json discovered_pages.json
+          if git diff --cached --quiet; then
+            echo "Nada nuevo que guardar."
+            exit 0
+          fi
+          git commit -m "Auto: eventos y estado detectados en páginas de universidades"
+          for intento in 1 2 3 4 5; do
+            if git push; then
+              echo "Push OK."
+              exit 0
+            fi
+            echo "Push rechazado (probablemente otro workflow escribió al mismo tiempo). Reintentando ($intento)..."
+            git fetch origin main
+            git rebase origin/main
+            sleep $((RANDOM % 10 + 3))
+          done
+          echo "ERROR: no se pudo hacer push tras varios intentos." >&2
+          exit 1
