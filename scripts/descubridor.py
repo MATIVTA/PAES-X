@@ -29,7 +29,7 @@ import urllib.parse
 import urllib.request
 
 DISCOVERED_FILE = os.environ.get("PAGINAS_DESCUBIERTAS_FILE", "discovered_pages.json")
-MAX_PAGINAS_GUARDADAS = 60
+MAX_PAGINAS_GUARDADAS = 120
 
 HEADERS_HTTP = {
     "User-Agent": (
@@ -47,13 +47,25 @@ CONSULTAS = [
     "ensayo PAES gratis Santiago 2026",
     "ensayo PAES gratis Concepción 2026",
     "ensayo PAES gratis Valparaíso 2026",
+    "ensayo PAES gratis Viña del Mar 2026",
     "ensayo PAES gratis Temuco 2026",
     "ensayo PAES gratis La Serena 2026",
+    "ensayo PAES gratis Coquimbo 2026",
     "ensayo PAES gratis Antofagasta 2026",
     "ensayo PAES gratis Valdivia 2026",
     "ensayo PAES gratis Puerto Montt 2026",
     "ensayo PAES gratis Rancagua 2026",
     "ensayo PAES gratis Talca 2026",
+    "ensayo PAES gratis Chillán 2026",
+    "ensayo PAES gratis Osorno 2026",
+    "ensayo PAES gratis Punta Arenas 2026",
+    "ensayo PAES gratis Copiapó 2026",
+    "ensayo PAES gratis Iquique 2026",
+    "ensayo PAES gratis Arica 2026",
+    "ensayo PAES gratis Los Ángeles 2026",
+    "ensayo PAES gratis Curicó 2026",
+    "ensayo PAES liceo municipal 2026",
+    "preuniversitario ensayo PAES presencial 2026",
     # Consultas dirigidas a redes sociales, que es donde muchos liceos y
     # sedes regionales avisan primero (ver nota sobre DOMINIOS_EXCLUIDOS).
     "ensayo PAES 2026 site:instagram.com",
