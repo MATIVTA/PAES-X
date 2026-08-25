@@ -22,10 +22,25 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python3 bot.py
 
-      - name: Guardar registro de avisos enviados
+      - name: Guardar registro de avisos enviados (con reintento si hay choque con otro workflow)
         run: |
           git config user.name "paes-x-bot"
           git config user.email "actions@github.com"
           git add sent_log.json
-          git diff --cached --quiet || git commit -m "Actualiza registro de avisos enviados"
-          git diff --cached --quiet || git push
+          if git diff --cached --quiet; then
+            echo "Nada nuevo que guardar."
+            exit 0
+          fi
+          git commit -m "Actualiza registro de avisos enviados"
+          for intento in 1 2 3 4 5; do
+            if git push; then
+              echo "Push OK."
+              exit 0
+            fi
+            echo "Push rechazado (probablemente otro workflow escribió al mismo tiempo). Reintentando ($intento)..."
+            git fetch origin main
+            git rebase origin/main
+            sleep $((RANDOM % 10 + 3))
+          done
+          echo "ERROR: no se pudo hacer push de sent_log.json tras varios intentos." >&2
+          exit 1
