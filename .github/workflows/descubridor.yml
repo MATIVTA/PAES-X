@@ -2,9 +2,8 @@ name: Descubridor de páginas de ensayos PAES
 
 on:
   schedule:
-    # Todos los domingos a las 12:00 UTC. Es una búsqueda, no hace falta
-    # correrla todos los días.
-    - cron: "0 12 * * 0"
+    # Domingos a las 15:10 UTC (lejos de las 12:00 de avisos.yml, para que no choquen).
+    - cron: "10 15 * * 0"
   workflow_dispatch: {}
 
 permissions:
@@ -20,10 +19,25 @@ jobs:
       - name: Buscar páginas nuevas de ensayos PAES
         run: python3 scripts/descubridor.py
 
-      - name: Commit de páginas descubiertas
+      - name: Commit de páginas descubiertas (con reintento si hay choque con otro workflow)
         run: |
           git config user.name "paes-x-bot"
           git config user.email "actions@github.com"
           git add discovered_pages.json
-          git diff --cached --quiet || git commit -m "Auto: nuevas páginas de ensayos descubiertas"
-          git diff --cached --quiet || git push
+          if git diff --cached --quiet; then
+            echo "Nada nuevo que guardar."
+            exit 0
+          fi
+          git commit -m "Auto: nuevas páginas de ensayos descubiertas"
+          for intento in 1 2 3 4 5; do
+            if git push; then
+              echo "Push OK."
+              exit 0
+            fi
+            echo "Push rechazado (probablemente otro workflow escribió al mismo tiempo). Reintentando ($intento)..."
+            git fetch origin main
+            git rebase origin/main
+            sleep $((RANDOM % 10 + 3))
+          done
+          echo "ERROR: no se pudo hacer push de discovered_pages.json tras varios intentos." >&2
+          exit 1
