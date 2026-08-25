@@ -108,14 +108,19 @@ def dias_texto(dias: int) -> str:
 
 
 def campos_evento(evento: dict) -> list:
-    fecha_evento = date.fromisoformat(evento["fecha"])
-    fields = [
-        {"name": "📅 Fecha", "value": fecha_larga(fecha_evento), "inline": True}
-    ]
+    fecha_raw = evento.get("fecha")
+    if fecha_raw:
+        fields = [
+            {"name": "📅 Fecha", "value": fecha_larga(date.fromisoformat(fecha_raw)), "inline": True}
+        ]
+    else:
+        fields = [{"name": "📅 Fecha", "value": "Por confirmar", "inline": True}]
     if (evento.get("hora") or "").strip():
         fields.append({"name": "🕐 Hora", "value": evento["hora"], "inline": True})
     if (evento.get("modalidad") or "").strip():
         fields.append({"name": "📍 Modalidad", "value": evento["modalidad"], "inline": True})
+    if (evento.get("notas") or "").strip():
+        fields.append({"name": "🗒️ Notas", "value": evento["notas"], "inline": False})
     return fields
 
 
@@ -308,6 +313,23 @@ def msg_nuevo(evento: dict) -> dict:
     return construir_embed(evento, titulo_embed, cuerpo, CIERRE_ACCION, COLOR_NUEVO, "Inscríbete/Revisa aquí")
 
 
+def msg_pendiente(evento: dict) -> dict:
+    """Embed para un evento que se detectó (por ejemplo una universidad que
+    claramente va a hacer un ensayo) pero cuya fecha exacta no se pudo leer
+    de forma confiable. En vez de quedar guardado a la espera de que alguien
+    lo revise manualmente, se avisa igual: mejor un aviso con fecha por
+    confirmar que ningún aviso."""
+    titulo = evento["titulo"]
+    titulo_embed = f"🔎 Ensayo detectado — {titulo} (fecha por confirmar)"
+    cuerpo = (
+        f"Encontramos indicios de un próximo **{titulo}**, pero no pudimos "
+        "leer la fecha exacta automáticamente (la página no la indica con "
+        "claridad, o tiene más de una fecha mencionada). Entra al link para "
+        "confirmar cuándo es."
+    )
+    return construir_embed(evento, titulo_embed, cuerpo, CIERRE_ACCION, COLOR_NUEVO, "Revisa la fecha aquí")
+
+
 CONSTRUCTORES = {
     "ensayo": msg_ensayo,
     "inscripcion": msg_inscripcion,
@@ -386,9 +408,23 @@ def main():
     enviados = 0
 
     for evento in eventos:
+        fecha_raw = evento.get("fecha")
+
+        if not fecha_raw:
+            # Evento con fecha por confirmar (lo agrega scraper_universidades.py
+            # cuando detecta un posible ensayo pero no una fecha clara). Se
+            # avisa UNA sola vez -- no hay fecha para calcular cuenta regresiva.
+            key_pendiente = f"{evento.get('id', evento['titulo'])}_pendiente"
+            if not log.get(key_pendiente):
+                print(f"Enviando aviso de evento pendiente de confirmar: {key_pendiente}")
+                enviar_webhook(msg_pendiente(evento))
+                log[key_pendiente] = True
+                enviados += 1
+            continue
+
         try:
-            fecha_evento = date.fromisoformat(evento["fecha"])
-        except (KeyError, ValueError):
+            fecha_evento = date.fromisoformat(fecha_raw)
+        except ValueError:
             print(f"AVISO: evento '{evento.get('id')}' tiene fecha inválida, se omite.")
             continue
 
