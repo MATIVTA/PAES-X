@@ -144,6 +144,22 @@ def buscar(consulta: str) -> list:
     return resultados
 
 
+# Palabras en el título del resultado que casi siempre indican que NO es un
+# ensayo con fecha y lugar, sino un recurso descargable (PDF, banco de
+# preguntas, simulador online) -- se descartan para no generar avisos de
+# "fecha por confirmar" sobre algo que nunca va a tener fecha.
+PALABRAS_NO_EVENTO = (
+    "descargable", "descargar", "pdf", "banco de preguntas",
+    "simulador online", "ensayo online gratis", "practica online",
+    "práctica online",
+)
+
+
+def parece_evento_real(titulo: str) -> bool:
+    titulo_lower = titulo.lower()
+    return not any(p in titulo_lower for p in PALABRAS_NO_EVENTO)
+
+
 def cargar_descubiertas() -> list:
     if not os.path.exists(DISCOVERED_FILE):
         return []
@@ -173,6 +189,9 @@ def main() -> int:
             # aparezca en la URL o el título del resultado.
             texto_check = (url + " " + titulo).lower()
             if "paes" not in texto_check and "ensayo" not in texto_check:
+                continue
+            if not parece_evento_real(titulo):
+                print(f"Descartada (parece recurso descargable, no evento con fecha): {titulo}")
                 continue
             descubiertas.append({"url": url, "titulo": titulo or url})
             urls_conocidas.add(url)
