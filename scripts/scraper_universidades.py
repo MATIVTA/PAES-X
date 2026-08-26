@@ -70,6 +70,15 @@ PAGINAS_A_VIGILAR = [
 PAGINAS_DESCUBIERTAS_FILE = os.environ.get("PAGINAS_DESCUBIERTAS_FILE", "discovered_pages.json")
 
 
+# Mismo filtro que usa descubridor.py: títulos que indican un recurso
+# descargable (PDF, banco de preguntas) en vez de un evento con fecha y lugar.
+PALABRAS_NO_EVENTO = (
+    "descargable", "descargar", "pdf", "banco de preguntas",
+    "simulador online", "ensayo online gratis", "practica online",
+    "práctica online",
+)
+
+
 def cargar_paginas_a_revisar() -> list:
     """Semillas curadas + páginas nuevas encontradas por scripts/descubridor.py,
     sin duplicar URLs."""
@@ -83,6 +92,9 @@ def cargar_paginas_a_revisar() -> list:
         except (json.JSONDecodeError, OSError):
             descubiertas = []
         for d in descubiertas:
+            titulo_d = (d.get("titulo") or "").lower()
+            if any(p in titulo_d for p in PALABRAS_NO_EVENTO):
+                continue  # recurso descargable, no un evento con fecha
             if d.get("url") and d["url"] not in urls_ya_incluidas:
                 paginas.append({
                     "nombre": d.get("titulo") or d["url"],
@@ -132,15 +144,19 @@ def descargar_texto(url: str) -> str:
 
 # ---------- Extracción de fechas ----------
 
-def inferir_anio(mes: int, dia: int, hoy: date) -> int:
-    for candidato in (hoy.year, hoy.year + 1):
-        try:
-            f = date(candidato, mes, dia)
-        except ValueError:
-            continue
-        if f >= hoy:
-            return candidato
-    return hoy.year + 1
+def inferir_anio(mes: int, dia: int, hoy: date):
+    """Si la fecha (sin año explícito en el texto) todavía no ocurre este
+    año, se asume el año actual. Si ya pasó este año, se descarta -- lo más
+    probable es que sea una fecha vieja que quedó en la página (un ensayo
+    que ya se hizo), NO un anuncio para el año siguiente. Adivinar "debe
+    ser el próximo año" es lo que generaba fechas fantasma tipo 2027 a
+    partir de anuncios de ensayos que ya pasaron. Devuelve None si se debe
+    descartar."""
+    try:
+        f = date(hoy.year, mes, dia)
+    except ValueError:
+        return None
+    return hoy.year if f >= hoy else None
 
 
 def _cerca_de_palabra_clave(texto_lower: str, ini: int, fin: int) -> bool:
@@ -161,6 +177,8 @@ def extraer_fechas_candidatas(texto: str, hoy: date = None) -> list:
         dia = int(m.group(1))
         mes = MESES[m.group(2).lower()]
         anio = int(m.group(3)) if m.group(3) else inferir_anio(mes, dia, hoy)
+        if anio is None:
+            continue  # fecha sin año explícito que ya pasó este año: se descarta, no se adivina
         try:
             f = date(anio, mes, dia)
         except ValueError:
