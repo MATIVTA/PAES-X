@@ -62,9 +62,11 @@ RE_TAG = re.compile(r"<[^>]+>")
 RE_YEAR_HEADER = re.compile(r"a[ñn]o\s+(\d{4})", re.IGNORECASE)
 RE_BULLET = re.compile(
     r"^(Ene|Feb|Mar|Abr|May|Jun|Jul|Ago|Sep|Oct|Nov|Dic)\.?\s+(\d{1,2})"
-    r"(?:\s*(?:al|a|-)\s*\d{1,2})?"          # rango de días, ej "15 al 17"
-    r"\s*(\d{1,2}:\d{2})?"                    # hora opcional
-    r"[\s\S]*?\s{2,}(.+)$",
+    r"(?:\s*(?:al|a|-)\s*\d{1,2})?"                 # rango de días, ej "15 al 17"
+    r"(?:\s+(\d{1,2}:\d{2}))?"                       # hora opcional (con su propio espacio)
+    r"(?:\s*(?:a|-|hasta)\s*\d{1,2}:\d{2})?"         # rango de horas opcional, ej "12:00 a 13:00"
+    r"\s*(?:hrs\.?)?"                                 # "hrs." opcional
+    r"\s+(.+)$",
     re.IGNORECASE,
 )
 
