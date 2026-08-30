@@ -175,6 +175,22 @@
       "fecha": null,
       "link": "https://librospaes.com/el-material-imprescindible-para-preparar-la-paes-2026-guia-completa-de-resumenes-y-ensayos/",
       "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-ensayo-paes-presencial-gratuito-experiencia-paes-2026",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES Presencial Gratuito | Experiencia PAES 2026",
+      "fecha": null,
+      "link": "https://www.preupdv.cl/blogs/realiza-gratis-un-nuevo-ensayo-paes-con-preuniversitario-pedro-de-valdivia-2",
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-ensayos-paes-2026-gratis-simulacros-filadd",
+      "tipo": "ensayo",
+      "titulo": "Ensayos PAES 2026 gratis — simulacros Filadd",
+      "fecha": null,
+      "link": "https://ensayospaes.cl/",
+      "origen": "scraper_universidades"
     }
   ]
 }
