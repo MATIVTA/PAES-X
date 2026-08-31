@@ -191,6 +191,14 @@
       "fecha": null,
       "link": "https://ensayospaes.cl/",
       "origen": "scraper_universidades"
+    },
+    {
+      "id": "pendiente-1er-ensayo-nacional-pack-digital-2026-psu-libros",
+      "tipo": "ensayo",
+      "titulo": "1er Ensayo Nacional Pack Digital 2026 - Psu Libros",
+      "fecha": null,
+      "link": "https://psulibros.com/producto/1er-ensayo-nacional-digital/",
+      "origen": "scraper_universidades"
     }
   ]
 }
