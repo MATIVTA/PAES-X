@@ -145,19 +145,30 @@ def buscar(consulta: str) -> list:
 
 
 # Palabras en el título del resultado que casi siempre indican que NO es un
-# ensayo con fecha y lugar, sino un recurso descargable (PDF, banco de
-# preguntas, simulador online) -- se descartan para no generar avisos de
-# "fecha por confirmar" sobre algo que nunca va a tener fecha.
+# ensayo con fecha y lugar, sino un recurso descargable, comercial o de
+# contenido (PDF, banco de preguntas, tienda, comunidad, blog de resúmenes)
+# -- se descartan para no generar avisos de "fecha por confirmar" sobre algo
+# que nunca va a tener fecha.
 PALABRAS_NO_EVENTO = (
     "descargable", "descargar", "pdf", "banco de preguntas",
     "simulador online", "ensayo online gratis", "practica online",
-    "práctica online",
+    "práctica online", "ranking", "pack digital", "guía completa",
+    "guia completa", "material imprescindible", "resumen", "resúmenes",
+    "resumenes", "libro", "libros", "comunidad", "foro",
 )
 
+# Dominios que son tiendas, comunidades o blogs de contenido -- nunca van a
+# publicar la fecha de un evento con lugar/hora, así que ni vale la pena
+# revisarlos.
+DOMINIOS_NO_EVENTO = ("skool.com", "psulibros.com", "librospaes.com")
 
-def parece_evento_real(titulo: str) -> bool:
+
+def parece_evento_real(titulo: str, url: str = "") -> bool:
     titulo_lower = titulo.lower()
-    return not any(p in titulo_lower for p in PALABRAS_NO_EVENTO)
+    if any(p in titulo_lower for p in PALABRAS_NO_EVENTO):
+        return False
+    dominio = urllib.parse.urlparse(url).netloc.lower() if url else ""
+    return not any(d in dominio for d in DOMINIOS_NO_EVENTO)
 
 
 def cargar_descubiertas() -> list:
@@ -190,8 +201,8 @@ def main() -> int:
             texto_check = (url + " " + titulo).lower()
             if "paes" not in texto_check and "ensayo" not in texto_check:
                 continue
-            if not parece_evento_real(titulo):
-                print(f"Descartada (parece recurso descargable, no evento con fecha): {titulo}")
+            if not parece_evento_real(titulo, url):
+                print(f"Descartada (parece recurso comercial/contenido, no evento con fecha): {titulo}")
                 continue
             descubiertas.append({"url": url, "titulo": titulo or url})
             urls_conocidas.add(url)
