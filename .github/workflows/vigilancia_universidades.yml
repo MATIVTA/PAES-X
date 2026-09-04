@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: write
-  issues: write
 
 jobs:
   scraper:
@@ -18,15 +17,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Buscar y publicar fechas de ensayos en páginas de universidades
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/scraper_universidades.py
 
-      - name: Commit de eventos nuevos y estado (con reintento si hay choque con otro workflow)
+      - name: Commit de eventos nuevos (con reintento si hay choque con otro workflow)
         run: |
           git config user.name "paes-x-bot"
           git config user.email "actions@github.com"
-          git add events.json watch_state.json discovered_pages.json
+          git add events.json discovered_pages.json
           if git diff --cached --quiet; then
             echo "Nada nuevo que guardar."
             exit 0

@@ -5,13 +5,22 @@ PAES (ensayos, inscripciones, resultados, cierres de plazo), con un mensaje
 distinto según el tipo de evento y cuántos días faltan. Corre gratis sobre
 GitHub Actions: no necesitas servidor, ni bot conectado 24/7, ni pagar nada.
 
+Funciona **totalmente solo**: los eventos se descubren, se les lee la fecha,
+se publican y se avisan por cuenta regresiva sin que tengas que revisar nada.
+Vuelve al repo solo cuando quieras cambiar el horario o la redacción de un
+mensaje.
+
 ## Cómo funciona
 
-- `events.json` — tu lista de eventos. Es lo único que editarás normalmente.
+- `events.json` — la lista de eventos. Los scrapers la mantienen solos.
 - `bot.py` — revisa la fecha de hoy, decide si toca avisar de algún evento
   y arma el mensaje según la plantilla de su tipo.
-- `.github/workflows/avisos.yml` — hace que GitHub ejecute `bot.py`
-  automáticamente todos los días a la hora que definas.
+- `scripts/scraper_demre.py` — lee el calendario oficial de DEMRE y agrega
+  los hitos del proceso de admisión (inscripciones, PAES, resultados…).
+- `scripts/scraper_universidades.py` — revisa las páginas de universidades y
+  agrega los ensayos con su fecha.
+- `.github/workflows/*.yml` — hacen que GitHub ejecute los scripts
+  automáticamente según un cron.
 - `sent_log.json` — registro interno para no enviar el mismo aviso dos veces.
   No lo edites a mano.
 
@@ -41,8 +50,10 @@ GitHub Actions: no necesitas servidor, ni bot conectado 24/7, ni pagar nada.
 
 ## Cómo agregar o editar un evento
 
-Edita `events.json` directamente desde la web de GitHub (icono de lápiz) y
-guarda ("Commit changes"). No necesitas tocar `bot.py` para nada de esto.
+En general **no hace falta** tocar `events.json`: los scrapers lo mantienen
+solo. Si igual quieres cargar un evento a mano, edita `events.json`
+directamente desde la web de GitHub (icono de lápiz) y guarda
+("Commit changes"). No necesitas tocar `bot.py`.
 
 Campos de cada evento:
 
@@ -51,15 +62,18 @@ Campos de cada evento:
 | `id`          | Sí          | Identificador único, sin espacios (ej. `ensayo-2-2026`).             |
 | `tipo`        | Sí          | `ensayo`, `inscripcion`, `resultados`, `cierre_plazo` o `generico`.   |
 | `titulo`      | Sí          | Nombre del evento tal cual quieres que aparezca en el mensaje.        |
-| `fecha`       | Sí          | Formato `YYYY-MM-DD`.                                                 |
+| `fecha`       | Sí          | Formato `YYYY-MM-DD`. Los eventos sin fecha ("por confirmar") son solo herencia de antes; los scrapers ya no los crean. |
 | `hora`        | No          | Texto libre, ej. `"09:00"`.                                          |
 | `link`        | Sí          | URL de inscripción / información / resultados.                       |
 | `modalidad`   | No          | Ej. `"Online"`, `"Presencial en tu liceo"`. Déjalo `""` si no aplica. |
 | `avisos_dias` | No          | Lista de días de anticipación, ej. `[14, 7, 1, 0]`. Si lo omites, se usa un default según el tipo (ver tabla abajo). |
 | `anuncio_inmediato` | No    | `true` / `false`. Por defecto (si no lo defines) el bot decide solo: anuncia el mismo día en que agregas el evento **solo si** faltan 25 días o menos para la fecha (`UMBRAL_ANUNCIO_INMEDIATO_DIAS` en `bot.py`). Si faltan más, espera y lo anuncia automáticamente el día en que el evento entre en esa ventana. Pon `true` para forzar el anuncio inmediato sin importar cuánto falte, o `false` para que nunca se anuncie de forma inmediata (solo cuenta regresiva). |
-| `origen`      | No          | Campo informativo, lo agrega el scraper automático (`scraper_demre.py`) a los eventos que detecta solo. Puedes borrarlo o ignorarlo. |
+| `origen`      | No          | Campo informativo que agregan los scrapers automáticos a los eventos que detectan solos. Puedes borrarlo o ignorarlo. |
 
-**Importante:** `avisos_dias` siempre son días **antes** del evento, y siempre positivos (`[14, 7, 1, 0]`, nunca `[-14, -7, -1, 0]`). Un evento con fecha ya pasada nunca genera avisos, sin importar qué diga `avisos_dias` o `sent_log.json`.
+**Importante:** `avisos_dias` siempre son días **antes** del evento, y siempre
+positivos (`[14, 7, 1, 0]`, nunca `[-14, -7, -1, 0]`). Un evento con fecha ya
+pasada nunca genera avisos, sin importar qué diga `avisos_dias` o
+`sent_log.json`.
 
 ### Defaults de anticipación por tipo (si no defines `avisos_dias`)
 
@@ -85,8 +99,8 @@ plano, no requieren saber programar para editarlas.
 
 ## Automatización: eventos que se agregan solos
 
-Aparte de `avisos.yml` (que publica los avisos todos los días), hay dos
-workflows más, ambos gratis y sin ningún servicio pago de por medio:
+Dos workflows complementan a `avisos.yml` (que publica los avisos todos los
+días). Todos son gratis, sin ningún servicio pago de por medio.
 
 - **`scraper_demre.yml`** (`scripts/scraper_demre.py`) — todos los lunes lee
   el calendario oficial de DEMRE (`demre.cl/calendario/...`) y agrega a
@@ -94,43 +108,39 @@ workflows más, ambos gratis y sin ningún servicio pago de por medio:
   postulación, matrícula, etc.) que todavía no tengas cargado. Nunca borra
   ni modifica un evento que ya exista — si un hito del calendario coincide
   en fecha y palabras clave con uno que ya tienes, lo salta para no duplicar.
-  Es la fuente más confiable porque el formato de esa página es estable.
 
-- **`descubridor.yml`** (`scripts/descubridor.py`) — todas las semanas
-  busca en DuckDuckGo (sin API key, gratis) páginas nuevas de ensayos PAES,
-  a nivel nacional y por ciudad (Concepción, Valparaíso, Temuco, La Serena,
-  Antofagasta, Valdivia, Puerto Montt, Rancagua, Talca...), incluyendo
-  Instagram y Facebook, que suele ser donde los liceos y sedes regionales
-  avisan primero. Ojo con esto último: Instagram y la versión de escritorio
-  de Facebook cargan el contenido con JavaScript y piden login, así que un
-  script sin navegador (la única forma de hacerlo gratis, sin depender de
-  ninguna cuenta) casi nunca puede leer el texto del post — para Facebook se
-  intenta la versión móvil, que a veces sí funciona; para Instagram no hay
-  atajo. Cuando no se puede leer, esas páginas caen igual al mecanismo de
-  abajo (Issue con el link) en vez de perderse.
 - **`vigilancia_universidades.yml`** (`scripts/scraper_universidades.py`) —
   todos los días revisa las páginas semilla (Santo Tomás, UC, U. Autónoma,
   USM, UAH, U. San Sebastián, UNAB+PDV — con sedes en Santiago, Concepción,
   Viña del Mar, Temuco, La Serena, Valdivia, Puerto Montt, Calama, entre
-  otras) más las que va encontrando `descubridor.py`, y busca fechas cerca
-  de la palabra "ensayo" en el texto de cada una:
-  - Si encuentra **una sola fecha futura clara**, agrega el evento a
-    `events.json` sola, sin que hagas nada.
-  - Si encuentra **varias fechas distintas** (ambigüedad real) o
-    **ninguna** (incluye el caso de páginas de redes sociales que no se
-    pudieron leer), no adivina — abre un **Issue** en este repo con lo que
-    encontró (o con el link, si no encontró nada) para que lo confirmes tú.
+  otras) más las que quedaron guardadas en `discovered_pages.json`, y publica
+  el próximo ensayo/evento con su fecha. Cómo decide, todo automático:
+  - Lee fechas en varios formatos: "5 de septiembre", "5 sep", "05/09/2026",
+    rangos "5 al 7 de septiembre", con o sin año.
+  - Si encuentra **una sola fecha futura**, la usa directamente.
+  - Si encuentra **varias**, elige sola la más confiable: la que la página
+    enmarca como fecha del evento ("se realizará", "se rinde") y, entre
+    esas, la más próxima al presente.
+  - Si la única fecha es un **plazo de inscripción** ("inscríbete hasta el
+    5 de septiembre"), lo publica como evento de inscripción/cierre de plazo
+    (que es lo que la página anuncia), no como la fecha del ensayo.
+  - Si la página **no tiene una fecha clara**, no publica nada: es preferible
+    no avisar a avisar con la fecha equivocada.
+  - Si una página **cambia su fecha**, el evento viejo se reemplaza solo.
+  - Además filtra el contenido que no es un evento (noticias, rankings,
+    tiendas, comunidades) para que jamás llegue a Discord.
 
-Con esto, en la inmensa mayoría de los casos no tienes que tocar nada:
-DEMRE y las semillas curadas se agregan solas siempre, la lista de páginas
-a vigilar crece sola con el descubridor, y solo terminas revisando un Issue
-cuando una página es realmente ambigua o no se pudo leer automáticamente.
+Con esto no tienes que tocar nada: DEMRE y las universidades se agregan
+solas, las fechas se leen y corrigen solas, los eventos viejos o sin fecha se
+limpian solos, y no queda ninguna revisión manual pendiente — ni Issues, ni
+"fecha por confirmar".
 
 ## Mantenimiento
 
-Prácticamente cero. El bot corre solo, no duplica avisos, y no requiere que
-mantengas nada "prendido". Revisa de vez en cuando los Issues que puedan
-abrirse (solo pasa cuando una página no tiene una fecha clara que extraer).
+Prácticamente cero. El bot corre solo, no duplica avisos y no requiere que
+mantengas nada "prendido". No se abre ni se pide revisar ningún Issue: lo
+único que eventualmente merece un vistazo es `events.json` si alguna vez
+quieres quitar o corregir un aviso a mano.
 
 ## Notas
 

@@ -1,22 +1,6 @@
 {
-  "_instrucciones": "Edita este archivo para agregar/quitar eventos a mano si quieres. tipo debe ser uno de: ensayo, inscripcion, resultados, cierre_plazo, generico. fecha en formato YYYY-MM-DD (o null si está \"por confirmar\"). avisos_dias es opcional y SIEMPRE positivo (días antes del evento): si lo omites, el bot usa un default según el tipo. En general no hace falta tocar este archivo a mano -- los scrapers lo mantienen solos.",
+  "_instrucciones": "Edita este archivo para agregar/quitar eventos a mano si quieres. tipo debe ser uno de: ensayo, inscripcion, resultados, cierre_plazo, generico. fecha en formato YYYY-MM-DD; los eventos sin fecha ('por confirmar') ya no se crean: si una página no tiene fecha clara, simplemente no se publica. avisos_dias es opcional y SIEMPRE positivo (días antes del evento): si lo omites, el bot usa un default según el tipo. En general no hace falta tocar este archivo a mano -- los scrapers lo mantienen solos.",
   "eventos": [
-    {
-      "id": "pendiente-ensayo-paes-santo-tom-s",
-      "tipo": "ensayo",
-      "titulo": "Ensayo PAES Santo Tomás",
-      "fecha": null,
-      "link": "https://enlinea.santotomas.cl/etiquetas/ensayo-paes/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayo-paes-uc",
-      "tipo": "ensayo",
-      "titulo": "Ensayo PAES UC",
-      "fecha": null,
-      "link": "https://admision.uc.cl/informacion-para/futuro-estudiante-de-pregrado/ensayos-paes-uc/ensayo-paes-uc-inscripcion/",
-      "origen": "scraper_universidades"
-    },
     {
       "id": "auto-ensayo-paes-universidad-aut-noma-2026-09-05",
       "tipo": "ensayo",
@@ -37,15 +21,6 @@
       "origen": "scraper_universidades"
     },
     {
-      "id": "pendiente-uah-actividades-para-postulantes",
-      "tipo": "generico",
-      "titulo": "UAH — Actividades para postulantes",
-      "fecha": null,
-      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
-      "origen": "scraper_universidades",
-      "notas": "Fechas mencionadas en la página: 29-09-2026, 03-10-2026, 14-11-2026"
-    },
-    {
       "id": "auto-ensayo-paes-universidad-san-sebasti-n-2026-10-03",
       "tipo": "ensayo",
       "titulo": "Ensayo PAES Universidad San Sebastián",
@@ -56,84 +31,12 @@
       "modalidad": "Presencial"
     },
     {
-      "id": "pendiente-ensayo-paes-online-universidad-san-sebasti-n",
-      "tipo": "ensayo",
-      "titulo": "Ensayo PAES online Universidad San Sebastián",
-      "fecha": null,
-      "link": "https://preuniversitario.uss.cl/ensayo-online",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayo-masivo-paes-unab-pdv",
-      "tipo": "ensayo",
-      "titulo": "Ensayo Masivo PAES UNAB + PDV",
-      "fecha": null,
-      "link": "https://explora.unab.cl/ensayo-masivo-paes-unab-pdv-2026-inscribete-aqui-y-preparate-con-un-ensayo-presencial-y-gratuito/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayo-nacional-paes-2026-inscripci-n-gratuita-online-preuca",
-      "tipo": "ensayo",
-      "titulo": "Ensayo Nacional PAES 2026 | Inscripción Gratuita Online | Preucap",
-      "fecha": null,
-      "link": "https://preucap.cl/ensayo-2026",
-      "origen": "scraper_universidades"
-    },
-    {
       "id": "auto-ensayo-paes-primavera-2026-inscr-bete-gratis-y-prep-rate-en--2026-09-26",
       "tipo": "ensayo",
       "titulo": "Ensayo PAES Primavera 2026: inscríbete gratis y prepárate en la UGM ...",
       "fecha": "2026-09-26",
       "hora": null,
       "link": "https://admision.ugm.cl/26-09-0900-hrs-ensayo-paes-primavera-2026-inscribete-gratis-y-preparate-en-la-ugm/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayo-paes-admisi-n-usm",
-      "tipo": "ensayo",
-      "titulo": "Ensayo PAES | Admisión USM",
-      "fecha": null,
-      "link": "https://difusion.usm.cl/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayo-paes-presencial-gratuito-experiencia-paes-2026",
-      "tipo": "ensayo",
-      "titulo": "Ensayo PAES Presencial Gratuito | Experiencia PAES 2026",
-      "fecha": null,
-      "link": "https://www.preupdv.cl/blogs/realiza-gratis-un-nuevo-ensayo-paes-con-preuniversitario-pedro-de-valdivia-2",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-inscripci-n-ensayo-paes-uc",
-      "tipo": "ensayo",
-      "titulo": "Inscripción Ensayo PAES UC",
-      "fecha": null,
-      "link": "https://admision.uc.cl/informacion-para/futuro-estudiante-de-pregrado/ensayos-paes-uc/ensayo-paes-uc-inscripcion/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayo-nacional-paes-2026-gratis-preuniversitario-filadd",
-      "tipo": "ensayo",
-      "titulo": "Ensayo Nacional PAES 2026 — Gratis | Preuniversitario Filadd",
-      "fecha": null,
-      "link": "https://ensayospaes.cl/ensayos/ensayo-nacional-paes-2026",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayo-nacional-paes-usm-universidad-t-cnica-federico-santa-",
-      "tipo": "ensayo",
-      "titulo": "Ensayo Nacional PAES USM - Universidad Técnica Federico Santa María",
-      "fecha": null,
-      "link": "https://usm.cl/admision/ensayousm/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayos-paes-online-2do-ensayo-nacional-2026-filadd",
-      "tipo": "ensayo",
-      "titulo": "Ensayos PAES Online — 2do Ensayo Nacional 2026 | Filadd",
-      "fecha": null,
-      "link": "https://ensayo-nacional.filadd.cl/ensayos/",
       "origen": "scraper_universidades"
     }
   ]

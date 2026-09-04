@@ -355,11 +355,10 @@ def msg_nuevo(evento: dict) -> dict:
 
 
 def msg_pendiente(evento: dict) -> dict:
-    """Embed para un evento que se detectó (por ejemplo una universidad que
-    claramente va a hacer un ensayo) pero cuya fecha exacta no se pudo leer
-    de forma confiable. En vez de quedar guardado a la espera de que alguien
-    lo revise manualmente, se avisa igual: mejor un aviso con fecha por
-    confirmar que ningún aviso. La etiqueta y el emoji dependen del tipo."""
+    """Embed para un evento con "fecha por confirmar". Los scrapers ya NO
+    crean este tipo de evento (prefieren no publicar nada a publicar una
+    fecha incierta o pedir revisión manual); este embed queda solo para
+    eventos que quedaron así en events.json antes de ese cambio."""
     titulo = evento["titulo"]
     tipo = evento.get("tipo", "generico")
     etiqueta = {
