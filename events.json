@@ -38,6 +38,16 @@
       "hora": null,
       "link": "https://admision.ugm.cl/26-09-0900-hrs-ensayo-paes-primavera-2026-inscribete-gratis-y-preparate-en-la-ugm/",
       "origen": "scraper_universidades"
+    },
+    {
+      "id": "auto-uah-actividades-para-postulantes-2026-09-29",
+      "tipo": "generico",
+      "titulo": "UAH — Actividades para postulantes",
+      "fecha": "2026-09-29",
+      "hora": null,
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "origen": "scraper_universidades",
+      "modalidad": "Online"
     }
   ]
 }
