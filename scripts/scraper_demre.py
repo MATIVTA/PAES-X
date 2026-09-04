@@ -14,6 +14,9 @@ nada en el workflow de GitHub Actions.
 Estrategia, a propósito conservadora:
 - Solo AGREGA eventos que no existan todavía (nunca modifica ni borra un
   evento que ya está en events.json, por si lo editaste a mano).
+- El calendario de DEMRE separa mes, día, hora y descripción en elementos
+  HTML distintos; este script los agrupa de vuelta en eventos con fecha,
+  hora y título.
 - Un evento del calendario se considera "ya existente" si hay un evento en
   events.json con la MISMA FECHA y al menos una palabra clave del título en
   común. Así no duplicamos, por ejemplo, "Rendición PAES Regular – Día 1"
@@ -33,7 +36,24 @@ import re
 import sys
 import urllib.error
 import urllib.request
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+
+try:
+    from zoneinfo import ZoneInfo
+    TZ = ZoneInfo("America/Santiago")
+except Exception:
+    TZ = None
+
+
+def hoy_santiago() -> date:
+    """Misma "hoy" que usa bot.py (hora de Chile), para que las comparaciones
+    de fecha sean consistentes con el país al que apuntan los eventos."""
+    try:
+        if TZ:
+            return datetime.now(TZ).date()
+    except Exception:
+        pass
+    return date.today()
 
 EVENTS_FILE = os.environ.get("EVENTS_FILE", "events.json")
 
@@ -60,15 +80,24 @@ BLOCK_TAGS = {"li", "br", "p", "div", "tr", "h1", "h2", "h3", "h4", "h5", "h6"}
 
 RE_TAG = re.compile(r"<[^>]+>")
 RE_YEAR_HEADER = re.compile(r"a[ñn]o\s+(\d{4})", re.IGNORECASE)
-RE_BULLET = re.compile(
-    r"^(Ene|Feb|Mar|Abr|May|Jun|Jul|Ago|Sep|Oct|Nov|Dic)\.?\s+(\d{1,2})"
-    r"(?:\s*(?:al|a|-)\s*\d{1,2})?"                 # rango de días, ej "15 al 17"
-    r"(?:\s+(\d{1,2}:\d{2}))?"                       # hora opcional (con su propio espacio)
-    r"(?:\s*(?:a|-|hasta)\s*\d{1,2}:\d{2})?"         # rango de horas opcional, ej "12:00 a 13:00"
-    r"\s*(?:hrs\.?)?"                                 # "hrs." opcional
-    r"\s+(.+)$",
+
+# El calendario actual de DEMRE separa mes, día, hora y descripción en
+# ELEMENTOS DISTINTOS, así que al pasar por strip_html_to_text quedan en
+# líneas separadas (ej: "Ene" / "23" / "Publicacion Temarios..."). Los tres
+# patrones de abajo reconocen cada tipo de línea dentro de esa secuencia.
+RE_MES_SOLO = re.compile(r"^(Ene|Feb|Mar|Abr|May|Jun|Jul|Ago|Sep|Oct|Nov|Dic)\.?$", re.IGNORECASE)
+RE_DIA_SOLO = re.compile(r"^\d{1,2}$")
+RE_HORA_SOLO = re.compile(
+    r"^\d{1,2}:\d{2}(?:\s*(?:a|-|hasta)\s*\d{1,2}:\d{2})?\s*(?:hrs?\.?)?$",
     re.IGNORECASE,
 )
+# Conectores con los que una línea de descripción puede terminar cortada
+# (el resto de la frase sigue en la línea siguiente).
+RE_INCOMPLETA = re.compile(
+    r"\b(de|del|el|la|los|las|en|al|a|y|hasta|para|por|sobre|con|según|durante)$",
+    re.IGNORECASE,
+)
+RESIDUO_COMENTARIO = {">", "->", "-->", "--", "-", "*"}
 
 TIPO_KEYWORDS = [
     ("resultados", ["resultado", "puntaje"]),
@@ -108,46 +137,89 @@ def slug(texto: str) -> str:
     return texto.strip("-")[:60]
 
 
+def _armar_titulo(descripcion_lines: list) -> str:
+    """Une las líneas de descripción de un evento. Se toma la primera línea
+    como título; si queda cortada con un conector ("Tarjeta de"), se agregan
+    las siguientes hasta completar la frase."""
+    if not descripcion_lines:
+        return ""
+    titulo = descripcion_lines[0]
+    i = 1
+    while i < len(descripcion_lines) and RE_INCOMPLETA.search(titulo):
+        titulo = f"{titulo} {descripcion_lines[i]}"
+        i += 1
+    return titulo.strip(" *")
+
+
 def parse_calendar_text(texto: str, anio_por_defecto: int = None) -> list:
     """Extrae eventos (fecha, hora, descripción) de la versión en texto plano
-    del calendario. Devuelve una lista de dicts con fecha ISO."""
+    del calendario. El formato actual de DEMRE secuencia, en líneas separadas:
+    MES / DÍA / [HORA] / DESCRIPCIÓN(1..n). Este parser consume esa secuencia
+    y descarta el ruido (encabezados de navegación, residuos de comentarios).
+    Devuelve una lista de dicts con fecha ISO."""
     eventos = []
     anio_actual = anio_por_defecto
+    mes_actual = None
+    dia_actual = None
+    hora_actual = None
+    desc_actual = []
+
+    def _flush():
+        nonlocal mes_actual, dia_actual, hora_actual, desc_actual
+        if (anio_actual and mes_actual is not None and dia_actual is not None):
+            try:
+                fecha = date(anio_actual, mes_actual, dia_actual)
+            except ValueError:
+                pass
+            else:
+                descripcion = _armar_titulo(desc_actual)
+                if len(descripcion) >= 6:
+                    eventos.append({
+                        "fecha": fecha.isoformat(),
+                        "hora": hora_actual,
+                        "descripcion": descripcion,
+                    })
+        mes_actual = None
+        dia_actual = None
+        hora_actual = None
+        desc_actual = []
 
     for linea in texto.splitlines():
         linea = linea.strip()
         linea = re.sub(r"^[-•*]\s*", "", linea)  # quita viñetas markdown/HTML
-        if not linea:
+        if not linea or linea in RESIDUO_COMENTARIO:
             continue
 
         m_anio = RE_YEAR_HEADER.search(linea)
         if m_anio:
+            _flush()  # "Año 2026"/"Año 2027": cierra lo anterior y cambia el año
             anio_actual = int(m_anio.group(1))
             continue
 
-        m = RE_BULLET.match(linea)
-        if not m or not anio_actual:
+        # Una línea que es SOLO el mes abre (o reabre) un evento.
+        if RE_MES_SOLO.fullmatch(linea):
+            _flush()
+            mes_actual = MESES.get(linea.lower().rstrip(".")[:3])
             continue
 
-        mes_txt, dia_txt, hora, descripcion = m.groups()
-        mes = MESES.get(mes_txt.lower()[:3])
-        if not mes:
-            continue
-        try:
-            fecha = date(anio_actual, mes, int(dia_txt))
-        except ValueError:
+        if mes_actual is not None and RE_DIA_SOLO.fullmatch(linea):
+            dia_actual = int(linea)
+            hora_actual = None
+            desc_actual = []
             continue
 
-        descripcion = descripcion.strip(" *").strip()
-        if len(descripcion) < 6:
+        if dia_actual is not None and RE_HORA_SOLO.fullmatch(linea):
+            hora_actual = linea
             continue
 
-        eventos.append({
-            "fecha": fecha.isoformat(),
-            "hora": hora,
-            "descripcion": descripcion,
-        })
+        # Con mes y día definidos, todo lo demás razonable es descripción.
+        if dia_actual is not None:
+            desc_actual.append(linea)
+            continue
 
+        # Línea fuera de un evento: se ignora (navegación, otros bloques).
+
+    _flush()
     return eventos
 
 
@@ -205,7 +277,7 @@ def main() -> int:
         return 1
 
     eventos_actuales = data.setdefault("eventos", [])
-    hoy = date.today()
+    hoy = hoy_santiago()
     agregados = 0
 
     for enc in encontrados:

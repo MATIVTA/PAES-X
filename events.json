@@ -105,35 +105,11 @@
       "origen": "scraper_universidades"
     },
     {
-      "id": "pendiente-ensayos-paes-2026-gratis-simulacros-filadd",
-      "tipo": "ensayo",
-      "titulo": "Ensayos PAES 2026 gratis — simulacros Filadd",
-      "fecha": null,
-      "link": "https://ensayospaes.cl/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-paes-de-invierno-2026-prep-rate-con-nuestro-ensayo-masivo",
-      "tipo": "ensayo",
-      "titulo": "PAES de Invierno 2026: prepárate con nuestro Ensayo Masivo",
-      "fecha": null,
-      "link": "https://explora.unab.cl/paes-de-invierno-2026-una-nueva-oportunidad-para-ingresar-a-la-educacion-superior/",
-      "origen": "scraper_universidades"
-    },
-    {
       "id": "pendiente-inscripci-n-ensayo-paes-uc",
       "tipo": "ensayo",
       "titulo": "Inscripción Ensayo PAES UC",
       "fecha": null,
       "link": "https://admision.uc.cl/informacion-para/futuro-estudiante-de-pregrado/ensayos-paes-uc/ensayo-paes-uc-inscripcion/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-usm-abre-inscripciones-para-su-ensayo-nacional-paes-2026",
-      "tipo": "ensayo",
-      "titulo": "USM abre inscripciones para su Ensayo Nacional PAES 2026",
-      "fecha": null,
-      "link": "https://usm.cl/noticias/usm-abre-inscripciones-para-su-ensayo-nacional-paes-2026/",
       "origen": "scraper_universidades"
     },
     {
@@ -145,14 +121,6 @@
       "origen": "scraper_universidades"
     },
     {
-      "id": "pendiente-ranking-nacional-ensayo-paes-2026-filadd",
-      "tipo": "ensayo",
-      "titulo": "Ranking Nacional — Ensayo PAES 2026 | Filadd",
-      "fecha": null,
-      "link": "https://ensayo-nacional.filadd.cl/ranking",
-      "origen": "scraper_universidades"
-    },
-    {
       "id": "pendiente-ensayo-nacional-paes-usm-universidad-t-cnica-federico-santa-",
       "tipo": "ensayo",
       "titulo": "Ensayo Nacional PAES USM - Universidad Técnica Federico Santa María",
@@ -161,43 +129,11 @@
       "origen": "scraper_universidades"
     },
     {
-      "id": "pendiente-ensayos-lenguaje-actualizados-2026-paes-2026-admisi-n-2027",
-      "tipo": "ensayo",
-      "titulo": "Ensayos lenguaje actualizados 2026 · PAES 2026 - Admisión 2027",
-      "fecha": null,
-      "link": "https://www.skool.com/comunidad-paes/ensayos-lenguaje-actualizados-2026",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-ensayos-paes-gratis-simulacros-en-l-nea-m1-m2-y-electivos",
-      "tipo": "ensayo",
-      "titulo": "Ensayos PAES Gratis | Simulacros en línea, M1, M2 y Electivos",
-      "fecha": null,
-      "link": "https://pruebapaes.cl/ensayos-paes-gratis/",
-      "origen": "scraper_universidades"
-    },
-    {
       "id": "pendiente-ensayos-paes-online-2do-ensayo-nacional-2026-filadd",
       "tipo": "ensayo",
       "titulo": "Ensayos PAES Online — 2do Ensayo Nacional 2026 | Filadd",
       "fecha": null,
       "link": "https://ensayo-nacional.filadd.cl/ensayos/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-el-material-imprescindible-para-preparar-la-paes-2026-gu-a-c",
-      "tipo": "ensayo",
-      "titulo": "El Material Imprescindible para Preparar la PAES 2026: Guía Completa de ...",
-      "fecha": null,
-      "link": "https://librospaes.com/el-material-imprescindible-para-preparar-la-paes-2026-guia-completa-de-resumenes-y-ensayos/",
-      "origen": "scraper_universidades"
-    },
-    {
-      "id": "pendiente-1er-ensayo-nacional-pack-digital-2026-psu-libros",
-      "tipo": "ensayo",
-      "titulo": "1er Ensayo Nacional Pack Digital 2026 - Psu Libros",
-      "fecha": null,
-      "link": "https://psulibros.com/producto/1er-ensayo-nacional-digital/",
       "origen": "scraper_universidades"
     }
   ]

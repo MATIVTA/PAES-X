@@ -20,6 +20,7 @@ para que el workflow de GitHub Actions no tenga que instalar nada.
 import json
 import os
 import sys
+import urllib.parse
 import urllib.request
 import urllib.error
 from datetime import date, datetime, timedelta
@@ -53,6 +54,46 @@ DEFAULTS_POR_TIPO = {
 # publicará automáticamente el día en que el evento entre en esta ventana,
 # sin que tengas que hacer nada. Ajusta este número si quieres otra ventana.
 UMBRAL_ANUNCIO_INMEDIATO_DIAS = 25
+
+# ---------- Filtro de contenido no-PAES (defensa de último momento) ----------
+# El scraper de universidades ya filtra antes de escribir events.json, pero el
+# bot corre ANTES que él cada día (12:00 vs 16:45 UTC) y no escribe events.json.
+# Si por cualquier razón queda una página suelta convertida en evento (una
+# noticia, un ranking, una tienda, una comunidad), este filtro la descarta AQUÍ
+# para que nunca llegue a Discord.
+PALABRAS_NO_EVENTO = (
+    "descargable", "descargar", "pdf", "banco de preguntas",
+    "simulador online", "simulacros en línea", "simulacros en linea",
+    "ensayo online gratis", "practica online", "práctica online",
+    "ranking", "pack digital", "guía completa", "guia completa",
+    "material imprescindible", "resumen", "resúmenes", "resumenes",
+    "libro", "libros", "comunidad", "foro",
+)
+# Dominios de tiendas/comunidades/portales de resúmenes que jamás son un
+# evento con fecha, pase lo que pase con el título que les hayan puesto.
+DOMINIOS_NO_EVENTO = ("skool.com", "psulibros.com", "librospaes.com")
+
+
+def dominio_de(url: str) -> str:
+    try:
+        netloc = urllib.parse.urlparse(url).netloc.lower()
+    except ValueError:
+        return url
+    return netloc[4:] if netloc.startswith("www.") else netloc
+
+
+def es_contenido_no_evento(titulo: str, url: str = "") -> bool:
+    """True si el evento es en realidad un recurso o contenido (PDF, ranking,
+    tienda, comunidad, blog) disfrazado de evento. En ese caso NO se publica."""
+    titulo_low = (titulo or "").lower()
+    if any(p in titulo_low for p in PALABRAS_NO_EVENTO):
+        return True
+    if url:
+        dominio = dominio_de(url)
+        if any(dom in dominio for dom in DOMINIOS_NO_EVENTO):
+            return True
+    return False
+
 
 EMOJI_TIPO = {
     "ensayo": "📝",
@@ -318,9 +359,17 @@ def msg_pendiente(evento: dict) -> dict:
     claramente va a hacer un ensayo) pero cuya fecha exacta no se pudo leer
     de forma confiable. En vez de quedar guardado a la espera de que alguien
     lo revise manualmente, se avisa igual: mejor un aviso con fecha por
-    confirmar que ningún aviso."""
+    confirmar que ningún aviso. La etiqueta y el emoji dependen del tipo."""
     titulo = evento["titulo"]
-    titulo_embed = f"🔎 Ensayo detectado — {titulo} (fecha por confirmar)"
+    tipo = evento.get("tipo", "generico")
+    etiqueta = {
+        "ensayo": "Ensayo",
+        "inscripcion": "Inscripción",
+        "resultados": "Resultados",
+        "cierre_plazo": "Plazo",
+    }.get(tipo, "Evento")
+    emoji = EMOJI_TIPO.get(tipo, "🔎")
+    titulo_embed = f"{emoji} {etiqueta} detectado — {titulo} (fecha por confirmar)"
     cuerpo = (
         f"Encontramos indicios de un próximo **{titulo}**, pero no pudimos "
         "leer la fecha exacta automáticamente (la página no la indica con "
@@ -408,6 +457,15 @@ def main():
     enviados = 0
 
     for evento in eventos:
+        # Nunca publicar contenido que no es un evento (noticia, ranking,
+        # tienda, comunidad) aunque haya quedado en events.json.
+        if es_contenido_no_evento(
+            evento.get("titulo") or "",
+            evento.get("link") or "",
+        ):
+            print(f"Omitido (no es un evento con fecha): {evento.get('id')}")
+            continue
+
         fecha_raw = evento.get("fecha")
 
         if not fecha_raw:
@@ -459,7 +517,20 @@ def main():
             log[key_nuevo] = True
             enviados += 1
 
-        avisos_dias = evento.get("avisos_dias") or DEFAULTS_POR_TIPO.get(tipo, [0])
+        avisos_dias = evento.get("avisos_dias")
+        if avisos_dias is None:
+            avisos_dias = DEFAULTS_POR_TIPO.get(tipo, [0])
+        elif isinstance(avisos_dias, (int, float)):
+            avisos_dias = [int(avisos_dias)]  # tolerar un único int ("avisos_dias": 7)
+        elif not isinstance(avisos_dias, list):
+            print(
+                f"AVISO: evento '{evento.get('id')}' tiene avisos_dias inválido "
+                f"({type(avisos_dias).__name__}); se usan los defaults.",
+                file=sys.stderr,
+            )
+            avisos_dias = DEFAULTS_POR_TIPO.get(tipo, [0])
+        else:
+            avisos_dias = [d for d in avisos_dias if isinstance(d, int)]
         avisos_dias_negativos = [d for d in avisos_dias if d < 0]
         if avisos_dias_negativos:
             print(

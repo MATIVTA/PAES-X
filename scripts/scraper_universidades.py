@@ -25,7 +25,24 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import date
+from datetime import date, datetime
+
+try:
+    from zoneinfo import ZoneInfo
+    TZ = ZoneInfo("America/Santiago")
+except Exception:
+    TZ = None
+
+
+def hoy_santiago() -> date:
+    """Misma "hoy" que usa bot.py (hora de Chile), para que las comparaciones
+    de fecha sean consistentes con el país al que apuntan los eventos."""
+    try:
+        if TZ:
+            return datetime.now(TZ).date()
+    except Exception:
+        pass
+    return date.today()
 
 EVENTS_FILE = os.environ.get("EVENTS_FILE", "events.json")
 STATE_FILE = os.environ.get("WATCH_STATE_FILE", "watch_state.json")
@@ -70,20 +87,54 @@ PAGINAS_A_VIGILAR = [
 PAGINAS_DESCUBIERTAS_FILE = os.environ.get("PAGINAS_DESCUBIERTAS_FILE", "discovered_pages.json")
 
 
-# Mismo filtro que usa descubridor.py: títulos que indican un recurso
-# descargable (PDF, banco de preguntas) en vez de un evento con fecha y lugar.
+# Filtro de contenido: títulos que indican un recurso o contenido (PDF,
+# banco de preguntas, ranking, blog de resúmenes, comunidad, tienda) en vez
+# de un evento con fecha y lugar. Sin esto, la página de una noticia, un foro
+# o una tienda terminaba convertida en "evento pendiente" y publicada en
+# Discord como si fuera un ensayo con fecha por confirmar.
 PALABRAS_NO_EVENTO = (
     "descargable", "descargar", "pdf", "banco de preguntas",
-    "simulador online", "ensayo online gratis", "practica online",
-    "práctica online",
+    "simulador online", "simulacros en línea", "simulacros en linea",
+    "ensayo online gratis", "practica online", "práctica online",
+    "ranking", "pack digital", "guía completa", "guia completa",
+    "material imprescindible", "resumen", "resúmenes", "resumenes",
+    "libro", "libros", "comunidad", "foro",
 )
+# Dominios de tiendas/comunidades/portales de resúmenes que jamás son un
+# evento con fecha: sus páginas no deben convertirse en avisos de Discord.
+DOMINIOS_NO_EVENTO = ("skool.com", "psulibros.com", "librospaes.com")
+
+
+def dominio_de(url: str) -> str:
+    try:
+        netloc = urllib.parse.urlparse(url).netloc.lower()
+    except ValueError:
+        return url
+    return netloc[4:] if netloc.startswith("www.") else netloc
+
+
+def es_contenido_no_evento(titulo: str, url: str = "") -> bool:
+    """True si el título/URL apuntan a un recurso o contenido (PDF, ranking,
+    tienda, comunidad, blog) y NO a un evento con fecha y lugar."""
+    titulo_low = (titulo or "").lower()
+    if any(p in titulo_low for p in PALABRAS_NO_EVENTO):
+        return True
+    if url:
+        dominio = dominio_de(url)
+        if any(dom in dominio for dom in DOMINIOS_NO_EVENTO):
+            return True
+    return False
 
 
 def cargar_paginas_a_revisar() -> list:
     """Semillas curadas + páginas nuevas encontradas por scripts/descubridor.py,
-    sin duplicar URLs."""
+    sin duplicar URLs ni dominios. Cuando hay varias páginas del MISMO dominio
+    (la landing, la subpágina de inscripción y una noticia, todas de la misma
+    universidad), solo se usa la primera -- evita mandar varios avisos "fecha
+    por confirmar" por el mismo ensayo, y evita colar noticias."""
     paginas = list(PAGINAS_A_VIGILAR)
     urls_ya_incluidas = {p["url"] for p in paginas}
+    dominios_ya_incluidos = {dominio_de(p["url"]) for p in paginas}
 
     if os.path.exists(PAGINAS_DESCUBIERTAS_FILE):
         try:
@@ -92,17 +143,23 @@ def cargar_paginas_a_revisar() -> list:
         except (json.JSONDecodeError, OSError):
             descubiertas = []
         for d in descubiertas:
-            titulo_d = (d.get("titulo") or "").lower()
-            if any(p in titulo_d for p in PALABRAS_NO_EVENTO):
-                continue  # recurso descargable, no un evento con fecha
-            if d.get("url") and d["url"] not in urls_ya_incluidas:
-                paginas.append({
-                    "nombre": d.get("titulo") or d["url"],
-                    "titulo": d.get("titulo") or d["url"],
-                    "url": d["url"],
-                    "tipo": "ensayo",
-                })
-                urls_ya_incluidas.add(d["url"])
+            titulo_d = d.get("titulo") or ""
+            url_d = d.get("url") or ""
+            if es_contenido_no_evento(titulo_d, url_d):
+                continue  # recurso/de contenido, no un evento con fecha
+            if not url_d or url_d in urls_ya_incluidas:
+                continue
+            dominio = dominio_de(url_d)
+            if dominio in dominios_ya_incluidos:
+                continue  # ya hay otra página de este mismo dominio en la lista
+            paginas.append({
+                "nombre": titulo_d or url_d,
+                "titulo": titulo_d or url_d,
+                "url": url_d,
+                "tipo": "ensayo",
+            })
+            urls_ya_incluidas.add(url_d)
+            dominios_ya_incluidos.add(dominio)
 
     return paginas
 
@@ -162,6 +219,32 @@ def inferir_anio(mes: int, dia: int, hoy: date):
 def _cerca_de_palabra_clave(texto_lower: str, ini: int, fin: int) -> bool:
     ventana = texto_lower[max(0, ini - VENTANA_CONTEXTO): fin + VENTANA_CONTEXTO]
     return any(p in ventana for p in PALABRAS_CLAVE)
+
+
+RE_PLAZO_INSCRIPCION = re.compile(
+    r"\b(hasta el|antes del?|último\s+d[ií]a|(?:se\s+)?cierra|vence|"
+    r"fecha\s+l[ií]mite|tope|fin\s+de\s+inscripci[oó]n)\b",
+    re.IGNORECASE,
+)
+RE_FECHA_DEL_EVENTO = re.compile(
+    r"\b(se\s+realiza|realizar[áa]|se\s+rendir|se\s+rinde|rendir[áa]s|"
+    r"el ensayo (?:es|ser[áa]|se har[áa])|tendr[áa] lugar|se har[áa]|"
+    r"fecha del ensayo|fecha\s+de\s+rendici[oó]n)\b",
+    re.IGNORECASE,
+)
+
+
+def contexto_sugiere_plazo(texto: str, ini: int, fin: int) -> bool:
+    """True si la única fecha detectada viene enmarcada como un PLAZO/FECHA
+    LÍMITE (ej. "inscríbete hasta el 5 de septiembre") en vez de como la fecha
+    del ensayo. En ese caso publicar esa fecha como la del ensayo sería
+    erróneo, así que el evento debe quedar pendiente de revisión."""
+    ventana = texto[max(0, ini - 30): fin + 20]
+    if not RE_PLAZO_INSCRIPCION.search(ventana):
+        return False
+    if RE_FECHA_DEL_EVENTO.search(ventana):
+        return False  # la página también dice/insinúa que ESE día es el evento
+    return True
 
 
 def extraer_fechas_candidatas(texto: str, hoy: date = None) -> list:
@@ -306,8 +389,23 @@ def main() -> int:
     data = cargar_events(EVENTS_FILE)
     eventos = data.setdefault("eventos", [])
     estado = cargar_estado()
-    hoy = date.today()
+    hoy = hoy_santiago()
     paginas = cargar_paginas_a_revisar()
+
+    # Limpieza global: si una decisión vieja (antes del filtro de contenido)
+    # metió a events.json una página que NO es un evento (noticia, ranking,
+    # tienda, comunidad), se borra para que bot.py no la vuelva a publicar.
+    # Solo toca lo que generamos nosotros (origen scraper_universidades),
+    # nunca eventos cargados a mano.
+    antes = len(eventos)
+    eventos[:] = [
+        e for e in eventos
+        if e.get("origen") != "scraper_universidades"
+        or not es_contenido_no_evento(e.get("titulo") or "", e.get("link") or "")
+    ]
+    if len(eventos) != antes:
+        print(f"Limpieza: se eliminaron {antes - len(eventos)} eventos de contenido no-PAES.")
+        guardar_events(EVENTS_FILE, data)
 
     agregados = 0
     pendientes = 0
@@ -330,9 +428,48 @@ def main() -> int:
             fecha, contexto, ini, fin = candidatas[0]
             if evento_ya_existe(titulo_limpio, fecha, eventos):
                 continue
-            # si esta página ya estaba publicada como "fecha por confirmar",
-            # la reemplazamos por la versión definitiva con fecha.
-            eventos[:] = [e for e in eventos if e.get("id") != id_pendiente]
+
+            # La única fecha detectada puede ser un PLAZO de inscripción
+            # ("inscríbete hasta el 5 de septiembre") en vez de la fecha del
+            # ensayo. Publicarla como fecha del evento sería el error de
+            # "lee mal las fechas" que queremos eliminar.
+            parece_plazo = (
+                tipo in ("ensayo", "generico")
+                and contexto_sugiere_plazo(texto, ini, fin)
+            )
+
+            # Si esta página ya tenía un evento con fecha (auto-...) de antes
+            # y aparece una fecha nueva/distinta, se reemplaza: la anterior
+            # pudo estar mal leída o ser un ensayo que se movió. También se
+            # reemplaza la versión "fecha por confirmar" (pendiente-...) ahora
+            # que la fecha quedó clara.
+            prefijo_auto = f"auto-{slug(titulo_limpio)}-"
+            eventos[:] = [
+                e for e in eventos
+                if not (e.get("id") or "").startswith(prefijo_auto)
+                and e.get("id") != id_pendiente
+            ]
+
+            if parece_plazo:
+                evento_pendiente = {
+                    "id": id_pendiente,
+                    "tipo": tipo,
+                    "titulo": titulo_limpio,
+                    "fecha": None,
+                    "link": url,
+                    "origen": "scraper_universidades",
+                    "notas": (
+                        f"Fecha detectada {fecha.isoformat()} (\"...{contexto}...\"), "
+                        "pero parece un plazo de inscripción y no la fecha del ensayo."
+                    ),
+                }
+                if not any(e.get("id") == id_pendiente for e in eventos):
+                    eventos.append(evento_pendiente)
+                    agregados += 1
+                pendientes += 1
+                print(f"Degradado a pendiente (plazo, no evento): {id_pendiente}")
+                continue
+
             nuevo_id = f"auto-{slug(titulo_limpio)}-{fecha.isoformat()}"
             modalidad = detectar_modalidad(texto, ini, fin)
             evento_nuevo = {
@@ -379,6 +516,12 @@ def main() -> int:
         titulo_issue = f"Revisar fecha en: {nombre}"
         if len(candidatas) == 0:
             motivo = "no se detectó ninguna fecha de ensayo en el texto de la página."
+        elif len(candidatas) == 1:
+            f, c, _, _ = candidatas[0]
+            motivo = (
+                f"se detectó la fecha {f.isoformat()} (\"...{c}...\"), pero parece "
+                "ser un plazo de inscripción más que la fecha del ensayo."
+            )
         else:
             listado = "\n".join(f"- {f.isoformat()} (\"...{c}...\")" for f, c, _, _ in candidatas)
             motivo = f"se detectaron {len(candidatas)} fechas distintas y no es seguro cuál usar:\n\n{listado}"
