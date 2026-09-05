@@ -48,6 +48,296 @@
       "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
       "origen": "scraper_universidades",
       "modalidad": "Online"
+    },
+    {
+      "id": "demre-auto-publicaci-n-oferta-definitiva-de-carreras-vacantes-y-pondera-2026-09-24",
+      "tipo": "generico",
+      "titulo": "Publicación Oferta Definitiva de Carreras, Vacantes y Ponderaciones, Admisión 2027",
+      "fecha": "2026-09-24",
+      "hora": null,
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-apertura-del-simulador-de-postulaciones-2026-10-13",
+      "tipo": "generico",
+      "titulo": "Apertura del Simulador de Postulaciones",
+      "fecha": "2026-10-13",
+      "hora": "12:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-publicaci-n-oficial-servicios-y-beneficios-universitarios-2026-11-19",
+      "tipo": "generico",
+      "titulo": "Publicación oficial Servicios y Beneficios Universitarios",
+      "fecha": "2026-11-19",
+      "hora": null,
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-inicio-presentaci-n-excusas-por-inasistencia-rendici-n-paes--2026-11-24",
+      "tipo": "ensayo",
+      "titulo": "Inicio Presentación Excusas por Inasistencia rendición PAES Regular",
+      "fecha": "2026-11-24",
+      "hora": "09:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-difusi-n-de-locales-de-rendici-n-paes-regular-a-trav-s-de-la-2026-11-28",
+      "tipo": "ensayo",
+      "titulo": "Difusión de locales de rendición PAES Regular a través de la descarga de una nueva",
+      "fecha": "2026-11-28",
+      "hora": "09:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-reconocimiento-de-salas-2026-12-01",
+      "tipo": "generico",
+      "titulo": "Reconocimiento de Salas",
+      "fecha": "2026-12-01",
+      "hora": "12:00 a 13:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-rendici-n-paes-competencia-matem-tica-2-m2-2026-12-01",
+      "tipo": "ensayo",
+      "titulo": "Rendición PAES Competencia Matemática 2 (M2)",
+      "fecha": "2026-12-01",
+      "hora": "15:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-rendici-n-paes-competencia-lectora-2026-12-02",
+      "tipo": "ensayo",
+      "titulo": "Rendición PAES Competencia Lectora",
+      "fecha": "2026-12-02",
+      "hora": "09:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-rendici-n-paes-competencia-matem-tica-1-m1-2026-12-03",
+      "tipo": "ensayo",
+      "titulo": "Rendición PAES Competencia Matemática 1 (M1)",
+      "fecha": "2026-12-03",
+      "hora": "09:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-fin-presentaci-n-excusas-por-inasistencia-rendici-n-paes-reg-2026-12-05",
+      "tipo": "cierre_plazo",
+      "titulo": "Fin Presentación Excusas por Inasistencia rendición PAES Regular",
+      "fecha": "2026-12-05",
+      "hora": "17:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-rendici-n-paes-regular-d-a-1-2026-11-30",
+      "tipo": "ensayo",
+      "titulo": "Rendición PAES Regular - Día 1",
+      "fecha": "2026-11-30",
+      "hora": null,
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-cierre-del-simulador-de-postulaciones-2026-12-15",
+      "tipo": "cierre_plazo",
+      "titulo": "Cierre del Simulador de Postulaciones",
+      "fecha": "2026-12-15",
+      "hora": "12:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-inicio-presentaci-n-excusas-por-inasistencia-rendici-n-paes--2026-11-20",
+      "tipo": "ensayo",
+      "titulo": "Inicio Presentación Excusas por Inasistencia rendición PAES Regular",
+      "fecha": "2026-11-20",
+      "hora": "09:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-reconocimiento-de-salas-2026-11-27",
+      "tipo": "generico",
+      "titulo": "Reconocimiento de Salas",
+      "fecha": "2026-11-27",
+      "hora": "12:00 a 13:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-rendici-n-paes-competencia-matem-tica-2-m2-rapa-nui-14-00-ho-2026-11-27",
+      "tipo": "ensayo",
+      "titulo": "Rendición PAES Competencia Matemática 2 (M2) - Rapa Nui: 14:00 horas",
+      "fecha": "2026-11-27",
+      "hora": "15:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-rendici-n-paes-competencia-matem-tica-1-m1-rapa-nui-08-00-ho-2026-11-29",
+      "tipo": "ensayo",
+      "titulo": "Rendición PAES Competencia Matemática 1 (M1) - Rapa Nui: 08:00 horas",
+      "fecha": "2026-11-29",
+      "hora": "09:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-apertura-del-simulador-asistente-de-postulaci-n-2026-12-04",
+      "tipo": "generico",
+      "titulo": "Apertura del Simulador Asistente de Postulación",
+      "fecha": "2026-12-04",
+      "hora": "09:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-cierre-del-simulador-asistente-de-postulaci-n-2026-12-29",
+      "tipo": "cierre_plazo",
+      "titulo": "Cierre del Simulador Asistente de Postulación",
+      "fecha": "2026-12-29",
+      "hora": "13:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-resultados-de-puntajes-paes-regular-hora-chile-continental-2027-01-04",
+      "tipo": "resultados",
+      "titulo": "Resultados de Puntajes PAES Regular (*Hora Chile Continental)",
+      "fecha": "2027-01-04",
+      "hora": "08:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-etapa-de-verificaci-n-de-puntajes-2027-01-02",
+      "tipo": "resultados",
+      "titulo": "Etapa de Verificación de Puntajes",
+      "fecha": "2027-01-02",
+      "hora": "09:00 - 17:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-finaliza-etapa-de-postulaciones-hora-chile-continental-2027-01-07",
+      "tipo": "cierre_plazo",
+      "titulo": "Finaliza Etapa de Postulaciones (*Hora Chile Continental)",
+      "fecha": "2027-01-07",
+      "hora": "13:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-publicaci-n-oficial-instrucciones-de-matr-cula-2027-01-07",
+      "tipo": "generico",
+      "titulo": "Publicación oficial Instrucciones de Matrícula",
+      "fecha": "2027-01-07",
+      "hora": null,
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-resultados-del-proceso-de-selecci-n-hora-chile-continental-2027-01-18",
+      "tipo": "resultados",
+      "titulo": "Resultados del Proceso de Selección (*Hora Chile Continental)",
+      "fecha": "2027-01-18",
+      "hora": "12:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-verificaci-n-de-resultados-de-selecci-n-2027-01-16",
+      "tipo": "resultados",
+      "titulo": "Verificación de Resultados de Selección",
+      "fecha": "2027-01-16",
+      "hora": "12:00 a 17:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-verificaci-n-de-resultados-de-selecci-n-2027-01-17",
+      "tipo": "resultados",
+      "titulo": "Verificación de Resultados de Selección",
+      "fecha": "2027-01-17",
+      "hora": "09:00 a 13:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-proceso-de-matr-cula-inicio-de-primera-etapa-2027-01-19",
+      "tipo": "generico",
+      "titulo": "Proceso de Matrícula: Inicio de primera etapa",
+      "fecha": "2027-01-19",
+      "hora": null,
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-proceso-de-matr-cula-cierre-de-primera-etapa-2027-01-21",
+      "tipo": "cierre_plazo",
+      "titulo": "Proceso de Matrícula: Cierre de primera etapa",
+      "fecha": "2027-01-21",
+      "hora": null,
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-proceso-de-matr-cula-inicio-de-segunda-etapa-2027-01-22",
+      "tipo": "generico",
+      "titulo": "Proceso de Matrícula: Inicio de segunda etapa",
+      "fecha": "2027-01-22",
+      "hora": null,
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
+    },
+    {
+      "id": "demre-auto-proceso-de-matr-cula-cierre-de-segunda-etapa-2027-01-28",
+      "tipo": "cierre_plazo",
+      "titulo": "Proceso de Matrícula: Cierre de segunda etapa",
+      "fecha": "2027-01-28",
+      "hora": null,
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
     }
   ]
 }
