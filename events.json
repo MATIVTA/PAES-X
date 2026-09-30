@@ -40,16 +40,6 @@
       "origen": "scraper_universidades"
     },
     {
-      "id": "auto-uah-actividades-para-postulantes-2026-09-29",
-      "tipo": "generico",
-      "titulo": "UAH — Actividades para postulantes",
-      "fecha": "2026-09-29",
-      "hora": null,
-      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
-      "origen": "scraper_universidades",
-      "modalidad": "Online"
-    },
-    {
       "id": "demre-auto-publicaci-n-oferta-definitiva-de-carreras-vacantes-y-pondera-2026-09-24",
       "tipo": "generico",
       "titulo": "Publicación Oferta Definitiva de Carreras, Vacantes y Ponderaciones, Admisión 2027",
@@ -338,6 +328,16 @@
       "link": "https://demre.cl/calendario",
       "modalidad": "Online",
       "origen": "scraper_demre"
+    },
+    {
+      "id": "auto-uah-actividades-para-postulantes-2026-10-03",
+      "tipo": "generico",
+      "titulo": "UAH — Actividades para postulantes",
+      "fecha": "2026-10-03",
+      "hora": null,
+      "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
+      "origen": "scraper_universidades",
+      "modalidad": "Online"
     }
   ]
 }
