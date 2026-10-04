@@ -21,16 +21,6 @@
       "origen": "scraper_universidades"
     },
     {
-      "id": "auto-ensayo-paes-universidad-san-sebasti-n-2026-10-03",
-      "tipo": "ensayo",
-      "titulo": "Ensayo PAES Universidad San Sebastián",
-      "fecha": "2026-10-03",
-      "hora": null,
-      "link": "https://preuniversitario.uss.cl/ensayo-presencial",
-      "origen": "scraper_universidades",
-      "modalidad": "Presencial"
-    },
-    {
       "id": "auto-ensayo-paes-primavera-2026-inscr-bete-gratis-y-prep-rate-en--2026-09-26",
       "tipo": "ensayo",
       "titulo": "Ensayo PAES Primavera 2026: inscríbete gratis y prepárate en la UGM ...",
@@ -330,14 +320,22 @@
       "origen": "scraper_demre"
     },
     {
-      "id": "auto-uah-actividades-para-postulantes-2026-10-03",
+      "id": "auto-uah-actividades-para-postulantes-2026-11-14",
       "tipo": "generico",
       "titulo": "UAH — Actividades para postulantes",
-      "fecha": "2026-10-03",
+      "fecha": "2026-11-14",
       "hora": null,
       "link": "https://admision.uahurtado.cl/ven-y-conocenos/",
-      "origen": "scraper_universidades",
-      "modalidad": "Online"
+      "origen": "scraper_universidades"
+    },
+    {
+      "id": "auto-ensayo-paes-universidad-san-sebasti-n-2026-10-17",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES Universidad San Sebastián",
+      "fecha": "2026-10-17",
+      "hora": null,
+      "link": "https://preuniversitario.uss.cl/ensayo-presencial",
+      "origen": "scraper_universidades"
     }
   ]
 }
