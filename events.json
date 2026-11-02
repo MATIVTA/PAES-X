@@ -336,6 +336,16 @@
       "hora": null,
       "link": "https://preuniversitario.uss.cl/ensayo-presencial",
       "origen": "scraper_universidades"
+    },
+    {
+      "id": "demre-auto-reconocimiento-de-salas-2026-11-30",
+      "tipo": "generico",
+      "titulo": "Reconocimiento de Salas",
+      "fecha": "2026-11-30",
+      "hora": "12:00 a 13:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
     }
   ]
 }
