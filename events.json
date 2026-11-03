@@ -346,6 +346,16 @@
       "link": "https://demre.cl/calendario",
       "modalidad": "Online",
       "origen": "scraper_demre"
+    },
+    {
+      "id": "auto-ensayo-paes-presencial-gratuito-experiencia-paes-2026-2026-11-28",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES Presencial Gratuito | Experiencia PAES 2026",
+      "fecha": "2026-11-28",
+      "hora": null,
+      "link": "https://www.preupdv.cl/blogs/realiza-gratis-un-nuevo-ensayo-paes-con-preuniversitario-pedro-de-valdivia-2",
+      "origen": "scraper_universidades",
+      "modalidad": "Presencial"
     }
   ]
 }
