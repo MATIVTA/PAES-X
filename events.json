@@ -356,6 +356,16 @@
       "link": "https://www.preupdv.cl/blogs/realiza-gratis-un-nuevo-ensayo-paes-con-preuniversitario-pedro-de-valdivia-2",
       "origen": "scraper_universidades",
       "modalidad": "Presencial"
+    },
+    {
+      "id": "demre-auto-fin-apelaci-n-a-la-rendici-n-a-la-paes-regular-2026-2026-12-04",
+      "tipo": "cierre_plazo",
+      "titulo": "Fin Apelación a la rendición a la PAES Regular 2026",
+      "fecha": "2026-12-04",
+      "hora": "13:00",
+      "link": "https://demre.cl/calendario",
+      "modalidad": "Online",
+      "origen": "scraper_demre"
     }
   ]
 }
