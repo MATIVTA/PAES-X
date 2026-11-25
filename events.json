@@ -329,15 +329,6 @@
       "origen": "scraper_universidades"
     },
     {
-      "id": "auto-ensayo-paes-universidad-san-sebasti-n-2026-10-17",
-      "tipo": "ensayo",
-      "titulo": "Ensayo PAES Universidad San Sebastián",
-      "fecha": "2026-10-17",
-      "hora": null,
-      "link": "https://preuniversitario.uss.cl/ensayo-presencial",
-      "origen": "scraper_universidades"
-    },
-    {
       "id": "demre-auto-reconocimiento-de-salas-2026-11-30",
       "tipo": "generico",
       "titulo": "Reconocimiento de Salas",
@@ -366,6 +357,16 @@
       "link": "https://demre.cl/calendario",
       "modalidad": "Online",
       "origen": "scraper_demre"
+    },
+    {
+      "id": "auto-ensayo-paes-universidad-san-sebasti-n-2026-11-27",
+      "tipo": "ensayo",
+      "titulo": "Ensayo PAES Universidad San Sebastián",
+      "fecha": "2026-11-27",
+      "hora": null,
+      "link": "https://preuniversitario.uss.cl/ensayo-presencial",
+      "origen": "scraper_universidades",
+      "modalidad": "Presencial"
     }
   ]
 }
